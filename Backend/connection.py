@@ -1,11 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, Response, request, redirect, url_for, jsonify
 from flask_cors import CORS
 import mysql.connector
 
 app = Flask(__name__)
-
-CORS(app, resources={r"/*": {"origins": "*"}})
-
+CORS(app)
 
 config = {
     'host': 'localhost',
@@ -20,14 +18,16 @@ def index():
 
 @app.route('/add', methods=['POST'])
 def add():
-    data = request.form['data']
+    print(request.json['data'])
+    data = request.json['data']
     conn = mysql.connector.connect(**config)
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO users (Name) VALUES (%s)", (data,))
+    cursor.execute(f'INSERT INTO consumable VALUES {data}')
     conn.commit()
     cursor.close()
     conn.close()
-    return redirect(url_for('index'))
+    response = {"status": "success"}
+    return jsonify(response)
 
 if __name__ == '__main__':
     app.run(debug=True)
