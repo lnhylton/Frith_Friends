@@ -4,39 +4,55 @@ import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
+
   const [count, setCount] = useState(0)
-  // POST request using fetch()
-  fetch("http://localhost:5000/add", {
+  const [data, setData] = useState("")
 
-    // Adding method type
-    method: "POST",
+  const testInput = event => {
+    setData(event.target.value);
+  };
 
-    // Adding body or contents to send
-    body: JSON.stringify({
-      title: "foo",
-      body: "bar",
-      userId: 1
-    
-    }),
+  const testSubmit = event => {
+    // POST request using fetch()
+    fetch("http://localhost:5000/add", {
 
-    // Adding headers to the request
-    headers: {
-      "Content-type": "application/json; charset=UTF-8"
-    }
-  })
+      // Adding method type
+      method: "POST",
 
-    // Converting to JSON
-    .then(response => response.json())
+      // Adding body or contents to send
+      body: JSON.stringify({
+        data: data
 
-    // Displaying results to console
-    .then(json => console.log(json));
+      }),
+
+      // Adding headers to the request
+      headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      }
+    })
+
+      // Converting to JSON
+      .then(response => response.json())
+
+      // Displaying results to console
+      .then(json => console.log(json));
+  }
+
+
 
   return (
     <div className="App">
       <div className='App-header'>
         <h1>Frith Friends</h1>
-      </div>
 
+      </div>
+      <input
+        type="text"
+        name="name"
+        onChange={testInput}
+        value={data}
+      />
+      <button type="submit" onClick={testSubmit} ></button>
     </div>
   )
 }
