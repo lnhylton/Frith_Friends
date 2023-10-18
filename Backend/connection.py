@@ -5,14 +5,14 @@ app = Flask(__name__)
 
 config = {
     'host': 'localhost',
-    'user': 'root',
-    'password': 'tiger123',
-    'database': 'sampledatabase'
+    'user': 'Admin',
+    'password': 'frith',
+    'database': 'frith_friends'
 }
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+# @app.route('/')
+# def index():
+#     return render_template('index.html')
 
 @app.route('/add', methods=['POST'])
 def add():
