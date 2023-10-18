@@ -21,7 +21,7 @@ function App() {
 
       // Adding body or contents to send
       body: JSON.stringify({
-        data: data
+        data: data.
 
       }),
 
