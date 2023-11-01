@@ -1,6 +1,13 @@
 .App{
   text-align: center;
   background-color: #125e68;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  color: white;
+  font-size: 50px;
 }
 
 .App-header{
@@ -10,4 +17,14 @@
   justify-content: top;
   font-size: calc(10px + 2vmin);
   color: white;
+}
+
+.success {
+  font-size: 100px;
+  color: white;
+}
+
+.input {
+  width: 1000px;
+  font-size: 20px;
 }

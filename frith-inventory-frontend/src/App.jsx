@@ -7,6 +7,7 @@ function App() {
 
   const [count, setCount] = useState(0)
   const [data, setData] = useState("")
+  const [latestResponse, setLatestResponse] = useState("")
 
   const testInput = event => {
     setData(event.target.value);
@@ -35,7 +36,13 @@ function App() {
       .then(response => response.json())
 
       // Displaying results to console
-      .then(json => console.log(json));
+      .then(res => {
+        setLatestResponse(res.status)
+        console.log(res)
+      })
+      .catch((e) => {
+        setLatestResponse("failed")
+      })
   }
 
 
@@ -46,13 +53,27 @@ function App() {
         <h1>Frith Friends</h1>
 
       </div>
-      <input
-        type="text"
-        name="name"
+      <label>This will add an item to "consumables" table</label>
+
+      <input className="input"
+        type="database"
+        name="database"
         onChange={testInput}
         value={data}
       />
-      <button type="submit" onClick={testSubmit} ></button>
+      <button type="submit" onClick={testSubmit} >Submit</button>
+      {
+        latestResponse === "success" ?
+          <label className="success">Success!</label>
+          :
+          <></>
+      }
+      {
+        latestResponse === "failed" ?
+          <label className="success">Failed!</label>
+          :
+          <></>
+      }
     </div>
   )
 }
