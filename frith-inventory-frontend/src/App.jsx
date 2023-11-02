@@ -7,6 +7,8 @@ function App() {
   const [tableName, setTableName] = useState("consumable"); // Default value
   const [itemId, setItemId] = useState("");
   const [updateData, setUpdateData] = useState("");
+  const [retrievedData, setRetrievedData] = useState(null); // Store retrieved data
+  const [editedData, setEditedData] = useState({});
 
   const handleDataChange = (event) => {
     setData(event.target.value);
@@ -22,6 +24,10 @@ function App() {
 
   const handleUpdateDataChange = (event) => {
     setUpdateData(event.target.value);
+  };
+
+  const handleEditValue = (key, value) => {
+    setEditedData({ ...editedData, [key]: value });
   };
 
   const handleDataSubmit = () => {
@@ -70,6 +76,43 @@ function App() {
           setLatestResponse("failed");
         });
     }
+  };
+
+  const handleRetrieveData = () => {
+    if (tableName && itemId) {
+      fetch(`http://localhost:5000/get_data?table_name=${tableName}&row_id=${itemId}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setRetrievedData(data.data);
+          setEditedData(data.data);
+        })
+        .catch((e) => {
+          setLatestResponse("failed");
+        });
+    }
+  };
+
+  const handleUpdateDataSubmit = () => {
+    // Perform your API call here to submit the updated data
+    fetch("http://localhost:5000/update", {
+      method: "PUT",
+      body: JSON.stringify({
+        tableName: tableName,
+        itemId: itemId,
+        updateData: editedData
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      }
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        setLatestResponse(res.status);
+        console.log(res);
+      })
+      .catch((e) => {
+        setLatestResponse("failed");
+      });
   };
 
   return (
@@ -122,11 +165,41 @@ function App() {
         Submit Update
       </button>
 
+      <button type="submit" onClick={handleRetrieveData}>
+        Retrieve Data
+      </button>
+
       {latestResponse === "success" ? (
         <label className="success">Success!</label>
       ) : latestResponse === "failed" ? (
         <label className="error">Failed!</label>
       ) : null}
+
+      {retrievedData && (
+        <div className="retrieved-data">
+          <h2>Retrieved Data</h2>
+          {Object.entries(retrievedData).map(([key, value]) => (
+            <div key={key} className="data-box">
+              <div className="data-entry">
+                <label className="data-label">
+                  {key}:
+                </label>
+                <input
+                  type="text"
+                  className="input data-value"
+                  value={editedData[key]}
+                  onChange={(e) => handleEditValue(key, e.target.value)}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+
+      <button type="submit" onClick={handleUpdateDataSubmit}>
+        Submit Updated Data
+      </button>
     </div>
   );
 }
