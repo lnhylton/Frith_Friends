@@ -3,6 +3,8 @@ from flask_cors import CORS
 import mysql.connector
 import ast
 
+BACKEND_PORT = 5001
+
 app = Flask(__name__)
 CORS(app)
 
@@ -146,4 +148,4 @@ def parse_dictionary(dictionary):
     return result
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=BACKEND_PORT)

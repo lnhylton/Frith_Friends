@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 
+const BACKEND_PORT = 5001
+
 function App() {
   const [data, setData] = useState("");
   const [latestResponse, setLatestResponse] = useState("");
@@ -44,7 +46,7 @@ function App() {
 
   const handleRetrieveAddData = () => {
     if (tableNameAdd) {
-      fetch(`http://localhost:5000/get_table_attributes?table_name=${tableNameAdd}`)
+      fetch(`http://localhost:${BACKEND_PORT}/get_table_attributes?table_name=${tableNameAdd}`)
         .then((response) => response.json())
         .then((data) => {
           setRetrievedDataAdd(data.data);
@@ -58,7 +60,7 @@ function App() {
 
   const handleRetrieveUpdateData = () => {
     if (tableNameUpdate && itemIdUpdate) {
-      fetch(`http://localhost:5000/get_data?table_name=${tableNameUpdate}&row_id=${itemIdUpdate}`)
+      fetch(`http://localhost:${BACKEND_PORT}/get_data?table_name=${tableNameUpdate}&row_id=${itemIdUpdate}`)
         .then((response) => response.json())
         .then((data) => {
           setRetrievedDataUpdate(data.data);
@@ -72,7 +74,7 @@ function App() {
 
   const handleUpdateDataSubmit = () => {
     // Perform your API call here to submit the updated data
-    fetch("http://localhost:5000/update", {
+    fetch("http://localhost:${BACKEND_PORT}/update", {
       method: "PUT",
       body: JSON.stringify({
         tableName: tableNameUpdate,
@@ -96,7 +98,7 @@ function App() {
   const handleAddDataSubmit = () => {
     console.log(editedDataAdd)
     // Perform your API call here to submit the updated data
-    fetch("http://localhost:5000/add", {
+    fetch("http://localhost:${BACKEND_PORT}/add", {
       method: "PUT",
       body: JSON.stringify({
         tableName: tableNameAdd,
