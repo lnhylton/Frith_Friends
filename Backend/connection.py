@@ -20,9 +20,10 @@ def index():
 def add():
     print(request.json['data'])
     data = request.json['data']
+    table = data['tableName']
     conn = mysql.connector.connect(**config)
     cursor = conn.cursor()
-    cursor.execute(f'INSERT INTO consumable VALUES {data}')
+    cursor.execute(f'INSERT INTO {table} VALUES {data}')
     conn.commit()
     cursor.close()
     conn.close()
