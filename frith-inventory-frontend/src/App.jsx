@@ -53,31 +53,6 @@ function App() {
     }
   };
 
-  const handleUpdateSubmit = () => {
-    if (tableName && itemId && updateData) {
-      // Perform your API call here for updating data
-      fetch("http://localhost:5000/update", {
-        method: "PUT",
-        body: JSON.stringify({
-          tableName: tableName,
-          itemId: itemId,
-          updateData: updateData
-        }),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8"
-        }
-      })
-        .then((response) => response.json())
-        .then((res) => {
-          setLatestResponse(res.status);
-          console.log(res);
-        })
-        .catch((e) => {
-          setLatestResponse("failed");
-        });
-    }
-  };
-
   const handleRetrieveData = () => {
     if (tableName && itemId) {
       fetch(`http://localhost:5000/get_data?table_name=${tableName}&row_id=${itemId}`)
@@ -161,9 +136,6 @@ function App() {
         onChange={handleUpdateDataChange}
         value={updateData}
       />
-      <button type="submit" onClick={handleUpdateSubmit}>
-        Submit Update
-      </button>
 
       <button type="submit" onClick={handleRetrieveData}>
         Retrieve Data
