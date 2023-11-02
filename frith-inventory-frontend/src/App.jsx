@@ -4,22 +4,31 @@ import './App.css';
 function App() {
   const [data, setData] = useState("");
   const [latestResponse, setLatestResponse] = useState("");
-  const [tableName, setTableName] = useState("consumable"); // Default value
-  const [itemId, setItemId] = useState("");
+
+  const [tableNameUpdate, setTableNameUpdate] = useState("consumable"); // Default value
+  const [retrievedDataUpdate, setRetrievedDataUpdate] = useState(null); // Store retrieved data
+  const [itemIdUpdate, setItemUpdate] = useState("");
   const [updateData, setUpdateData] = useState("");
-  const [retrievedData, setRetrievedData] = useState(null); // Store retrieved data
-  const [editedData, setEditedData] = useState({});
+
+  const [tableNameAdd, setTableNameAdd] = useState("consumable"); // Default value
+  const [retrievedDataAdd, setRetrievedDataAdd] = useState(null); // Store retrieved data
+  
+  const [editedDataUpdate, setEditedDataUpdate] = useState({});
 
   const handleDataChange = (event) => {
     setData(event.target.value);
   };
 
-  const handleTableNameChange = (event) => {
-    setTableName(event.target.value);
+  const handleTableNameChangeUpdate = (event) => {
+    setTableNameUpdate(event.target.value);
+  };
+
+  const handleTableNameChangeAdd = (event) => {
+    setTableNameAdd(event.target.value);
   };
 
   const handleItemIdChange = (event) => {
-    setItemId(event.target.value);
+    setItemUpdate(event.target.value);
   };
 
   const handleUpdateDataChange = (event) => {
@@ -27,7 +36,7 @@ function App() {
   };
 
   const handleEditValue = (key, value) => {
-    setEditedData({ ...editedData, [key]: value });
+    setEditedDataUpdate({ ...editedDataUpdate, [key]: value });
   };
 
   const handleDataSubmit = () => {
@@ -53,13 +62,27 @@ function App() {
     }
   };
 
-  const handleRetrieveData = () => {
-    if (tableName && itemId) {
-      fetch(`http://localhost:5000/get_data?table_name=${tableName}&row_id=${itemId}`)
+  const handleRetrieveAddData = () => {
+    if (tableNameAdd) {
+      fetch(`http://localhost:5000/get_table_attributes?table_name=${tableNameAdd}`)
         .then((response) => response.json())
         .then((data) => {
-          setRetrievedData(data.data);
-          setEditedData(data.data);
+          setRetrievedDataAdd(data.data);
+          console.log(data.data)
+        })
+        .catch((e) => {
+          setLatestResponse("failed");
+        });
+    }
+  };
+
+  const handleRetrieveUpdateData = () => {
+    if (tableNameUpdate && itemIdUpdate) {
+      fetch(`http://localhost:5000/get_data?table_name=${tableNameUpdate}&row_id=${itemIdUpdate}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setRetrievedDataUpdate(data.data);
+          setEditedDataUpdate(data.data);
         })
         .catch((e) => {
           setLatestResponse("failed");
@@ -72,9 +95,9 @@ function App() {
     fetch("http://localhost:5000/update", {
       method: "PUT",
       body: JSON.stringify({
-        tableName: tableName,
-        itemId: itemId,
-        updateData: editedData
+        tableName: tableNameUpdate,
+        itemId: itemIdUpdate,
+        updateData: editedDataUpdate
       }),
       headers: {
         "Content-type": "application/json; charset=UTF-8"
@@ -96,22 +119,30 @@ function App() {
         <h1>Frith Friends</h1>
       </div>
       <label>This will add an item to the consumable table:</label>
-      <input
+      <select
         className="input"
-        type="database"
-        placeholder="Data to Add"
-        onChange={handleDataChange}
-        value={data}
-      />
-      <button type="submit" onClick={handleDataSubmit}>
-        Submit Add
+        onChange={handleTableNameChangeAdd}
+        value={tableNameUpdate}
+      >
+        <option value="consumable">consumable</option>
+        <option value="consumable_location">consumable_location</option>
+        <option value="machine">machine</option>
+        <option value="machine_location">machine_location</option>
+        <option value="non_consumable">non_consumable</option>
+        <option value="non_consumable_location">non_consumable_location</option>
+        <option value="room">room</option>
+        <option value="storage_medium">storage_medium</option>
+      </select>
+      <button type="submit" onClick={handleRetrieveAddData}>
+        Retrieve Data
       </button>
+
 
       <label>This will update an item to the selected table:</label>
       <select
         className="input"
-        onChange={handleTableNameChange}
-        value={tableName}
+        onChange={handleTableNameChangeUpdate}
+        value={tableNameUpdate}
       >
         <option value="consumable">consumable</option>
         <option value="consumable_location">consumable_location</option>
@@ -127,17 +158,10 @@ function App() {
         type="text"
         placeholder="Item ID"
         onChange={handleItemIdChange}
-        value={itemId}
-      />
-      <input
-        className="input"
-        type="text"
-        placeholder="Update Data"
-        onChange={handleUpdateDataChange}
-        value={updateData}
+        value={itemIdUpdate}
       />
 
-      <button type="submit" onClick={handleRetrieveData}>
+      <button type="submit" onClick={handleRetrieveUpdateData}>
         Retrieve Data
       </button>
 
@@ -147,10 +171,10 @@ function App() {
         <label className="error">Failed!</label>
       ) : null}
 
-      {retrievedData && (
+      {retrievedDataUpdate && (
         <div className="retrieved-data">
           <h2>Retrieved Data</h2>
-          {Object.entries(retrievedData).map(([key, value]) => (
+          {Object.entries(retrievedDataUpdate).map(([key, value]) => (
             <div key={key} className="data-box">
               <div className="data-entry">
                 <label className="data-label">
@@ -159,7 +183,7 @@ function App() {
                 <input
                   type="text"
                   className="input data-value"
-                  value={editedData[key]}
+                  value={editedDataUpdate[key]}
                   onChange={(e) => handleEditValue(key, e.target.value)}
                 />
               </div>

@@ -92,6 +92,36 @@ def get_data():
     except Exception as e:
         conn.close()
         return jsonify({"status": "error", "message": str(e)})
+    
+@app.route('/get_table_attributes', methods=['GET'])
+def get_table_attributes():
+    table_name = request.args.get('table_name')
+    
+    if table_name is None:
+        return jsonify({"status": "error", "message": "Table name is required."})
+
+    conn = mysql.connector.connect(**config)
+    cursor = conn.cursor()
+    try:
+        # Use a parameterized query to retrieve data from the specified table
+        cursor.execute(f'SHOW COLUMNS FROM {table_name}')
+        columns = cursor.fetchall()
+
+
+        column_names = [c[0] for c in columns]
+        print(column_names)
+
+        conn.close()
+        
+        # Convert the retrieved row to a dictionary for JSON response
+        columns = [desc[0] for desc in cursor.description]
+
+        return jsonify({"status": "success", "data": column_names})
+    
+    except Exception as e:
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)})
+    
 
 def parse_dictionary(dictionary):
     key_value_pairs = [f"{key} = \"{value}\"" for key, value in dictionary.items()]
