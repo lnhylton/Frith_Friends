@@ -8,12 +8,11 @@ function App() {
   const [tableNameUpdate, setTableNameUpdate] = useState("consumable"); // Default value
   const [retrievedDataUpdate, setRetrievedDataUpdate] = useState(null); // Store retrieved data
   const [itemIdUpdate, setItemUpdate] = useState("");
-  const [updateData, setUpdateData] = useState("");
+  const [editedDataUpdate, setEditedDataUpdate] = useState({});
 
   const [tableNameAdd, setTableNameAdd] = useState("consumable"); // Default value
   const [retrievedDataAdd, setRetrievedDataAdd] = useState(null); // Store retrieved data
-  
-  const [editedDataUpdate, setEditedDataUpdate] = useState({});
+  const [editedDataAdd, setEditedDataAdd] = useState({});
 
   const handleDataChange = (event) => {
     setData(event.target.value);
@@ -35,31 +34,12 @@ function App() {
     setUpdateData(event.target.value);
   };
 
-  const handleEditValue = (key, value) => {
+  const handleEditValueUpdate = (key, value) => {
     setEditedDataUpdate({ ...editedDataUpdate, [key]: value });
   };
 
-  const handleDataSubmit = () => {
-    if (data) {
-      // Perform your API call here for adding data
-      fetch("http://localhost:5000/add", {
-        method: "POST",
-        body: JSON.stringify({
-          data: data
-        }),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8"
-        }
-      })
-        .then((response) => response.json())
-        .then((res) => {
-          setLatestResponse(res.status);
-          console.log(res);
-        })
-        .catch((e) => {
-          setLatestResponse("failed");
-        });
-    }
+  const handleEditValueAdd = (key, value) => {
+    setEditedDataAdd({ ...editedDataAdd, [key]: value });
   };
 
   const handleRetrieveAddData = () => {
@@ -113,6 +93,29 @@ function App() {
       });
   };
 
+  const handleAddDataSubmit = () => {
+    console.log(editedDataAdd)
+    // Perform your API call here to submit the updated data
+    fetch("http://localhost:5000/add", {
+      method: "PUT",
+      body: JSON.stringify({
+        tableName: tableNameAdd,
+        addData: editedDataAdd
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      }
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        setLatestResponse(res.status);
+        console.log(res);
+      })
+      .catch((e) => {
+        setLatestResponse("failed");
+      });
+  };
+
   return (
     <div className="App">
       <div className="App-header">
@@ -122,7 +125,7 @@ function App() {
       <select
         className="input"
         onChange={handleTableNameChangeAdd}
-        value={tableNameUpdate}
+        value={tableNameAdd}
       >
         <option value="consumable">consumable</option>
         <option value="consumable_location">consumable_location</option>
@@ -133,8 +136,33 @@ function App() {
         <option value="room">room</option>
         <option value="storage_medium">storage_medium</option>
       </select>
+
       <button type="submit" onClick={handleRetrieveAddData}>
         Retrieve Data
+      </button>
+
+      {retrievedDataAdd && (
+        <div className="retrieved-data">
+          <h2>Retrieved Data</h2>
+          {Object.entries(retrievedDataAdd).map(([key, value]) => (
+            <div key={key} className="data-box">
+              <div className="data-entry">
+                <label className="data-label">
+                  {value}:
+                </label>
+                <input
+                  type="text"
+                  className="input data-value"
+                  onChange={(e) => handleEditValueAdd(value, e.target.value)}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <button type="submit" onClick={handleAddDataSubmit}>
+        Submit Add Data
       </button>
 
 
@@ -184,7 +212,7 @@ function App() {
                   type="text"
                   className="input data-value"
                   value={editedDataUpdate[key]}
-                  onChange={(e) => handleEditValue(key, e.target.value)}
+                  onChange={(e) => handleEditValueUpdate(key, e.target.value)}
                 />
               </div>
             </div>

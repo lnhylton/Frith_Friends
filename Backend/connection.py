@@ -17,28 +17,45 @@ config = {
 def index():
     pass
 
-@app.route('/add', methods=['POST'])
+@app.route('/add', methods=['PUT'])
 def add():
-    print(request.json['data'])
-    data = request.json['data']
-    conn = mysql.connector.connect(**config)
-    cursor = conn.cursor()
-    cursor.execute(f'INSERT INTO consumable VALUES {data}')
-    conn.commit()
-    cursor.close()
-    conn.close()
-    response = {"status": "success"}
+    try:
+        data = request.json
+        addData = parse_dictionary(data['addData'])
+
+        print(addData)
+
+        conn = mysql.connector.connect(**config)
+        cursor = conn.cursor()
+
+        query = f"INSERT INTO {data['tableName']} SET {addData}"
+        print(query)
+
+        # Using parameterized query to add a specific item by its ID
+        cursor.execute(query)
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+        response = {"status": "success"}
+
+    except Exception as e:
+        response = {"status": "error", "message": str(e)}
+
     return jsonify(response)
 
 @app.route('/update', methods=['PUT'])
 def update():
     #try:
-    print(request.json)
+    # print(request.json)
     data = request.json
     table_id_col = get_item_ids(data['tableName'])
     conn = mysql.connector.connect(**config)
     cursor = conn.cursor()
     updateData = parse_dictionary(data['updateData'])
+
+    # print(updateData)
+
     print(f"UPDATE {data['tableName']} SET {updateData} WHERE {table_id_col} = {data['itemId']}")
     # Using parameterized query to update a specific item by its ID
     cursor.execute(f"UPDATE {data['tableName']} SET {updateData} WHERE {table_id_col} = {data['itemId']}")
