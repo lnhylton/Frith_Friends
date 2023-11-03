@@ -84,6 +84,7 @@ def update():
 
 @app.route('/delete', methods=['DELETE'])
 def delete():
+    print("HELLO WORLD!")
     try:
         print(request.json)
         data = request.json
@@ -94,9 +95,9 @@ def delete():
         cursor = conn.cursor()
 
 
-        print(f"DELETE FROM {data['tableName']} WHERE {table_id_col} = {data['itemId']}")
+        print(f"DELETE FROM {data['tableName']} WHERE {table_id_col} = {data['deleteId']}")
         # Using parameterized query to update a specific item by its ID
-        cursor.execute(f"DELETE FROM {data['tableName']} WHERE {table_id_col} = {data['itemId']}")
+        cursor.execute(f"DELETE FROM {data['tableName']} WHERE {table_id_col} = {data['deleteId']}")
         conn.commit()
         cursor.close()
         conn.close()

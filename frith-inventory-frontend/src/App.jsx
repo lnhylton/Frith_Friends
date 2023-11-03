@@ -108,7 +108,7 @@ function App() {
   const handleAddDataSubmit = () => {
     console.log(editedDataAdd)
     // Perform your API call here to submit the updated data
-    fetch("http://localhost:${BACKEND_PORT}/add", {
+    fetch(`http://localhost:${BACKEND_PORT}/add`, {
       method: "PUT",
       body: JSON.stringify({
         tableName: tableNameAdd,
@@ -130,8 +130,9 @@ function App() {
 
   const handleDeleteSubmit = () => {
     console.log(itemIdDelete)
+    console.log("Colton is a good friend")
     // Perform your API call here to submit the updated data
-    fetch("http://localhost:${BACKEND_PORT}/delete", {
+    fetch(`http://localhost:${BACKEND_PORT}/delete`, {
       method: "DELETE",
       body: JSON.stringify({
         tableName: tableNameAdd,
@@ -280,7 +281,7 @@ function App() {
       />
 
       <button type="submit" onClick={handleDeleteSubmit}>
-        Submite Delete
+        Submit Delete
       </button>
 
     </div>
