@@ -8,8 +8,10 @@ function App() {
   const [latestResponse, setLatestResponse] = useState("");
 
   const [tableNameUpdate, setTableNameUpdate] = useState("consumable"); // Default value
+  const [tableNameDelete, setTableNameDelete] = useState("consumable"); // Default value
   const [retrievedDataUpdate, setRetrievedDataUpdate] = useState(null); // Store retrieved data
   const [itemIdUpdate, setItemUpdate] = useState("");
+  const [itemIdDelete, setItemDelete] = useState("");
   const [editedDataUpdate, setEditedDataUpdate] = useState({});
 
   const [tableNameAdd, setTableNameAdd] = useState("consumable"); // Default value
@@ -24,12 +26,20 @@ function App() {
     setTableNameUpdate(event.target.value);
   };
 
+  const handleTableNameChangeDelete = (event) => {
+    setTableNameDelete(event.target.value);
+  };
+
   const handleTableNameChangeAdd = (event) => {
     setTableNameAdd(event.target.value);
   };
 
   const handleItemIdChange = (event) => {
     setItemUpdate(event.target.value);
+  };
+
+  const handleItemIdDeleteChange = (event) => {
+    setItemDelete(event.target.value);
   };
 
   const handleUpdateDataChange = (event) => {
@@ -103,6 +113,29 @@ function App() {
       body: JSON.stringify({
         tableName: tableNameAdd,
         addData: editedDataAdd
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      }
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        setLatestResponse(res.status);
+        console.log(res);
+      })
+      .catch((e) => {
+        setLatestResponse("failed");
+      });
+  };
+
+  const handleDeleteSubmit = () => {
+    console.log(itemIdDelete)
+    // Perform your API call here to submit the updated data
+    fetch("http://localhost:${BACKEND_PORT}/delete", {
+      method: "DELETE",
+      body: JSON.stringify({
+        tableName: tableNameAdd,
+        deleteId: itemIdDelete
       }),
       headers: {
         "Content-type": "application/json; charset=UTF-8"
@@ -223,10 +256,39 @@ function App() {
       )}
 
 
-      <button type="submit" onClick={handleUpdateDataSubmit}>
-        Submit Updated Data
+      <label>This will delete an item to the selected table:</label>
+      <select
+        className="input"
+        onChange={handleTableNameChangeDelete}
+        value={tableNameDelete}
+      >
+        <option value="consumable">consumable</option>
+        <option value="consumable_location">consumable_location</option>
+        <option value="machine">machine</option>
+        <option value="machine_location">machine_location</option>
+        <option value="non_consumable">non_consumable</option>
+        <option value="non_consumable_location">non_consumable_location</option>
+        <option value="room">room</option>
+        <option value="storage_medium">storage_medium</option>
+      </select>
+      <input
+        className="input"
+        type="text"
+        placeholder="Item ID"
+        onChange={handleItemIdDeleteChange}
+        value={itemIdDelete}
+      />
+
+      <button type="submit" onClick={handleDeleteSubmit}>
+        Submite Delete
       </button>
+
     </div>
+
+    
+
+
+            
   );
 }
 
