@@ -1,22 +1,65 @@
+body{
+  margin:0px;
+  
+  background-color: black;
+}
+
 .App{
-  text-align: center;
-  background-color: #125e68;
+  font-size: 50px;
 
   display: flex;
   flex-direction: column;
   align-items: center;
-
+  
+  background: linear-gradient(maroon, navy);
   color: white;
-  font-size: 50px;
+
+  /* text-shadow: 0.5px 0.5px 1px white; */
 }
 
 .App-header{
-  background-color: #20709e;
   flex-direction: column;
   align-items: center;
   justify-content: top;
   font-size: calc(10px + 2vmin);
   color: white;
+}
+
+.itembox {
+  font-size: 50%;
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  background-color: black;
+  border: solid 1px white;
+
+  margin-bottom: 50px;
+  padding: 50px;
+}
+
+.update {
+  font-size: 50%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.retrieved-data {
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.data-box {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .success {
@@ -25,6 +68,10 @@
 }
 
 .input {
-  width: 1000px;
+  width: 400px;
   font-size: 20px;
+}
+
+h2 {
+  margin: 20px;
 }

@@ -123,109 +123,111 @@ function App() {
       <div className="App-header">
         <h1>Frith Friends</h1>
       </div>
-      <label>This will add an item to the consumable table:</label>
-      <select
-        className="input"
-        onChange={handleTableNameChangeAdd}
-        value={tableNameAdd}
-      >
-        <option value="consumable">consumable</option>
-        <option value="consumable_location">consumable_location</option>
-        <option value="machine">machine</option>
-        <option value="machine_location">machine_location</option>
-        <option value="non_consumable">non_consumable</option>
-        <option value="non_consumable_location">non_consumable_location</option>
-        <option value="room">room</option>
-        <option value="storage_medium">storage_medium</option>
-      </select>
 
-      <button type="submit" onClick={handleRetrieveAddData}>
-        Retrieve Data
-      </button>
+      <div className="itembox">
+        <h2>Add an item to the table selected</h2>
+        <select
+          className="input"
+          onChange={handleTableNameChangeAdd}
+          value={tableNameAdd}
+        >
+          <option value="consumable">consumable</option>
+          <option value="consumable_location">consumable_location</option>
+          <option value="machine">machine</option>
+          <option value="machine_location">machine_location</option>
+          <option value="non_consumable">non_consumable</option>
+          <option value="non_consumable_location">non_consumable_location</option>
+          <option value="room">room</option>
+          <option value="storage_medium">storage_medium</option>
+        </select>
 
-      {retrievedDataAdd && (
-        <div className="retrieved-data">
-          <h2>Retrieved Data</h2>
-          {Object.entries(retrievedDataAdd).map(([key, value]) => (
-            <div key={key} className="data-box">
-              <div className="data-entry">
-                <label className="data-label">
-                  {value}:
-                </label>
-                <input
-                  type="text"
-                  className="input data-value"
-                  onChange={(e) => handleEditValueAdd(value, e.target.value)}
-                />
+        <button type="submit" onClick={handleRetrieveAddData}>
+          Retrieve Data
+        </button>
+
+        {retrievedDataAdd && (
+          <div className="retrieved-data">
+            <h3>Data to Add</h3>
+            {Object.entries(retrievedDataAdd).map(([key, value]) => (
+              <div key={key} className="data-box">
+                  <label className="data-label">
+                    {value}:
+                  </label>
+                  <input
+                    type="text"
+                    className="input data-value"
+                    onChange={(e) => handleEditValueAdd(value, e.target.value)}
+                  />
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
 
-      <button type="submit" onClick={handleAddDataSubmit}>
-        Submit Add Data
-      </button>
+        <button type="submit" onClick={handleAddDataSubmit}>
+          Submit Add Data
+        </button>
+      </div>
+
+      <div className="itembox">
 
 
-      <label>This will update an item to the selected table:</label>
-      <select
-        className="input"
-        onChange={handleTableNameChangeUpdate}
-        value={tableNameUpdate}
-      >
-        <option value="consumable">consumable</option>
-        <option value="consumable_location">consumable_location</option>
-        <option value="machine">machine</option>
-        <option value="machine_location">machine_location</option>
-        <option value="non_consumable">non_consumable</option>
-        <option value="non_consumable_location">non_consumable_location</option>
-        <option value="room">room</option>
-        <option value="storage_medium">storage_medium</option>
-      </select>
-      <input
-        className="input"
-        type="text"
-        placeholder="Item ID"
-        onChange={handleItemIdChange}
-        value={itemIdUpdate}
-      />
+        <h2>Update an item located in the table below</h2>
+        <select
+          className="input"
+          onChange={handleTableNameChangeUpdate}
+          value={tableNameUpdate}
+        >
+          <option value="consumable">consumable</option>
+          <option value="consumable_location">consumable_location</option>
+          <option value="machine">machine</option>
+          <option value="machine_location">machine_location</option>
+          <option value="non_consumable">non_consumable</option>
+          <option value="non_consumable_location">non_consumable_location</option>
+          <option value="room">room</option>
+          <option value="storage_medium">storage_medium</option>
+        </select>
+        <input
+          className="input"
+          type="text"
+          placeholder="Item ID"
+          onChange={handleItemIdChange}
+          value={itemIdUpdate}
+        />
 
-      <button type="submit" onClick={handleRetrieveUpdateData}>
-        Retrieve Data
-      </button>
+        <button type="submit" onClick={handleRetrieveUpdateData}>
+          Retrieve Data
+        </button>
 
-      {latestResponse === "success" ? (
-        <label className="success">Success!</label>
-      ) : latestResponse === "failed" ? (
-        <label className="error">Failed!</label>
-      ) : null}
-
-      {retrievedDataUpdate && (
-        <div className="retrieved-data">
-          <h2>Retrieved Data</h2>
-          {Object.entries(retrievedDataUpdate).map(([key, value]) => (
-            <div key={key} className="data-box">
-              <div className="data-entry">
-                <label className="data-label">
-                  {key}:
-                </label>
-                <input
-                  type="text"
-                  className="input data-value"
-                  value={editedDataUpdate[key]}
-                  onChange={(e) => handleEditValueUpdate(key, e.target.value)}
-                />
+        {latestResponse === "success" ? (
+          <label className="success">Success!</label>
+        ) : latestResponse === "failed" ? (
+          <label className="error">Failed!</label>
+        ) : null}
+        
+        {retrievedDataUpdate && (
+          <div className="retrieved-data">
+            <h3>Data to Update</h3>
+            {Object.entries(retrievedDataUpdate).map(([key, value]) => (
+              <div key={key} className="data-box">
+                  <label className="data-label">
+                    {key}:
+                  </label>
+                  <input
+                    type="text"
+                    className="input data-value"
+                    value={editedDataUpdate[key]}
+                    onChange={(e) => handleEditValueUpdate(key, e.target.value)}
+                  />
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
 
 
-      <button type="submit" onClick={handleUpdateDataSubmit}>
-        Submit Updated Data
-      </button>
+        <button type="submit" onClick={handleUpdateDataSubmit}>
+          Submit Updated Data
+        </button>
+      </div>
     </div>
   );
 }
