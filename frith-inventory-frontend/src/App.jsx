@@ -6,6 +6,8 @@ const BACKEND_PORT = 5001
 function App() {
   const [data, setData] = useState("");
   const [latestResponse, setLatestResponse] = useState("");
+  const [latestDeleteResponse, setLatestDeleteResponse] = useState("");
+
 
   const [tableNameUpdate, setTableNameUpdate] = useState("consumable"); // Default value
   const [tableNameDelete, setTableNameDelete] = useState("consumable"); // Default value
@@ -144,11 +146,11 @@ function App() {
     })
       .then((response) => response.json())
       .then((res) => {
-        setLatestResponse(res.status);
+        setLatestDeleteResponse(res.status);
         console.log(res);
       })
       .catch((e) => {
-        setLatestResponse("failed");
+        setLatestDeleteResponse("failed");
       });
   };
 
@@ -283,6 +285,12 @@ function App() {
       <button type="submit" onClick={handleDeleteSubmit}>
         Submit Delete
       </button>
+
+      {latestDeleteResponse === "success" ? (
+        <label className="success">Success!</label>
+      ) : latestDeleteResponse === "failed" ? (
+        <label className="error">Failed!</label>
+      ) : null}
 
     </div>
 
