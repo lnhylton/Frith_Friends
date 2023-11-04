@@ -58,8 +58,9 @@ def add():
 
     return jsonify(response)
 
-@app.route('/update', methods=['PUT'])
+@app.route('/update', methods=["PUT"])
 def update():
+    
     #try:
     # print(request.json)
     data = request.json
@@ -67,6 +68,8 @@ def update():
     conn = mysql.connector.connect(**config)
     cursor = conn.cursor()
     updateData = parse_dictionary(data['updateData'])
+
+    print(data)
 
     # print(updateData)
 
