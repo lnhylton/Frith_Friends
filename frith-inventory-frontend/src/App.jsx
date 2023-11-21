@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './App.css';
+import LoginForm from './login'; // Assuming the login file is in the same directory
 
 const BACKEND_PORT = 5001
 
@@ -18,6 +19,8 @@ function App() {
   const [tableNameAdd, setTableNameAdd] = useState("consumable"); // Default value
   const [retrievedDataAdd, setRetrievedDataAdd] = useState(null); // Store retrieved data
   const [editedDataAdd, setEditedDataAdd] = useState({});
+
+  const [loggedIn, setLoggedIn] = useState(false); // Login state
 
   const handleTableNameChangeUpdate = (event) => {
     setTableNameUpdate(event.target.value);
@@ -51,6 +54,21 @@ function App() {
     setEditedDataAdd({ ...editedDataAdd, [key]: value });
   };
 
+  /* -------------------------------------------------------------------------- */
+  /*                                   Login                                    */
+  /* -------------------------------------------------------------------------- */
+
+  const handleBackToMainContent = () => {
+    setLoggedIn(false);
+  };
+
+  const handleLogin = () => {
+    setLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    setLoggedIn(false);
+  };
 
   /* -------------------------------------------------------------------------- */
   /*                                     Add                                    */
@@ -167,153 +185,166 @@ function App() {
 
   return (
     <div className="App">
-      <div className="App-header">
-        <h1>Frith Friends</h1>
-      </div>
-
-      {/* -------------------------------- add -------------------------------- */}
-
-      <div className="itembox">
-        <h2>Add an item to the table selected</h2>
-        <select
-          className="input"
-          onChange={handleTableNameChangeAdd}
-          value={tableNameAdd}
-        >
-          <option value="consumable">consumable</option>
-          <option value="consumable_location">consumable_location</option>
-          <option value="machine">machine</option>
-          <option value="machine_location">machine_location</option>
-          <option value="non_consumable">non_consumable</option>
-          <option value="non_consumable_location">non_consumable_location</option>
-          <option value="room">room</option>
-          <option value="storage_medium">storage_medium</option>
-        </select>
-
-        <button type="submit" onClick={handleRetrieveAddData}>
-          Retrieve Data
+      {!loggedIn ? (
+        <button className="login-button" onClick={handleLogin}>
+          Login Page
         </button>
+      ) : null}
 
-        {retrievedDataAdd && (
-          <div className="retrieved-data">
-            <h3>Data to Add</h3>
-            {Object.entries(retrievedDataAdd).map(([key, value]) => (
-              <div key={key} className="data-box">
-                <label className="data-label">
-                  {value}:
-                </label>
-                <input
-                  type="text"
-                  className="input data-value"
-                  onChange={(e) => handleEditValueAdd(value, e.target.value)}
-                />
-              </div>
-            ))}
+      {loggedIn ? (
+        <div>
+          <LoginForm onLogin={handleLogout} onBack={handleBackToMainContent} />
+        </div>
+      ) : (
+        <div>
+          <div className="App-header">
+            <h1>Frith Friends</h1>
           </div>
-        )}
 
-        <button type="submit" onClick={handleAddDataSubmit}>
-          Submit Add Data
-        </button>
+          {/* -------------------------------- add -------------------------------- */}
 
-        <label className="query-status">
-          {latestResponseAdd}
-        </label>
-      </div>
+          <div className="itembox">
+            <h2>Add an item to the table selected</h2>
+            <select
+              className="input"
+              onChange={handleTableNameChangeAdd}
+              value={tableNameAdd}
+            >
+              <option value="consumable">consumable</option>
+              <option value="consumable_location">consumable_location</option>
+              <option value="machine">machine</option>
+              <option value="machine_location">machine_location</option>
+              <option value="non_consumable">non_consumable</option>
+              <option value="non_consumable_location">non_consumable_location</option>
+              <option value="room">room</option>
+              <option value="storage_medium">storage_medium</option>
+            </select>
 
-      {/* -------------------------------- update ----------------------------- */}
+            <button type="submit" onClick={handleRetrieveAddData}>
+              Retrieve Data
+            </button>
 
-      <div className="itembox">
-        <h2>Update an item located in the table below</h2>
-        <select
-          className="input"
-          onChange={handleTableNameChangeUpdate}
-          value={tableNameUpdate}
-        >
-          <option value="consumable">consumable</option>
-          <option value="consumable_location">consumable_location</option>
-          <option value="machine">machine</option>
-          <option value="machine_location">machine_location</option>
-          <option value="non_consumable">non_consumable</option>
-          <option value="non_consumable_location">non_consumable_location</option>
-          <option value="room">room</option>
-          <option value="storage_medium">storage_medium</option>
-        </select>
-        <input
-          className="input"
-          type="text"
-          placeholder="Item ID"
-          onChange={handleItemIdChange}
-          value={itemIdUpdate}
-        />
-
-        <button type="submit" onClick={handleRetrieveUpdateData}>
-          Retrieve Data
-        </button>
-
-        {retrievedDataUpdate && (
-          <div className="retrieved-data">
-            <h3>Data to Update</h3>
-            {Object.entries(retrievedDataUpdate).map(([key, value]) => (
-              <div key={key} className="data-box">
-                <label className="data-label">
-                  {key}:
-                </label>
-                <input
-                  type="text"
-                  className="input data-value"
-                  value={editedDataUpdate[key]}
-                  onChange={(e) => handleEditValueUpdate(key, e.target.value)}
-                />
+            {retrievedDataAdd && (
+              <div className="retrieved-data">
+                <h3>Data to Add</h3>
+                {Object.entries(retrievedDataAdd).map(([key, value]) => (
+                  <div key={key} className="data-box">
+                    <label className="data-label">
+                      {value}:
+                    </label>
+                    <input
+                      type="text"
+                      className="input data-value"
+                      onChange={(e) => handleEditValueAdd(value, e.target.value)}
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
+
+            <button type="submit" onClick={handleAddDataSubmit}>
+              Submit Add Data
+            </button>
+
+            <label className="query-status">
+              {latestResponseAdd}
+            </label>
           </div>
-        )}
-        <button type="submit" onClick={handleUpdateDataSubmit}>
-          Submit Updated Data
-        </button>
 
-        <label className="query-status">
-          {latestResponseUpdate}
-        </label>
-      </div>
+          {/* -------------------------------- update ----------------------------- */}
 
-      {/* -------------------------------- delete ----------------------------- */}
+          <div className="itembox">
+            <h2>Update an item located in the table below</h2>
+            <select
+              className="input"
+              onChange={handleTableNameChangeUpdate}
+              value={tableNameUpdate}
+            >
+              <option value="consumable">consumable</option>
+              <option value="consumable_location">consumable_location</option>
+              <option value="machine">machine</option>
+              <option value="machine_location">machine_location</option>
+              <option value="non_consumable">non_consumable</option>
+              <option value="non_consumable_location">non_consumable_location</option>
+              <option value="room">room</option>
+              <option value="storage_medium">storage_medium</option>
+            </select>
+            <input
+              className="input"
+              type="text"
+              placeholder="Item ID"
+              onChange={handleItemIdChange}
+              value={itemIdUpdate}
+            />
 
-      <div className="itembox">
-        <h2>This will delete an item to the selected table:</h2>
-        <select
-          className="input"
-          onChange={handleTableNameChangeDelete}
-          value={tableNameDelete}
-        >
-          <option value="consumable">consumable</option>
-          <option value="consumable_location">consumable_location</option>
-          <option value="machine">machine</option>
-          <option value="machine_location">machine_location</option>
-          <option value="non_consumable">non_consumable</option>
-          <option value="non_consumable_location">non_consumable_location</option>
-          <option value="room">room</option>
-          <option value="storage_medium">storage_medium</option>
-        </select>
-        <input
-          className="input"
-          type="text"
-          placeholder="Item ID"
-          onChange={handleItemIdDeleteChange}
-          value={itemIdDelete}
-        />
+            <button type="submit" onClick={handleRetrieveUpdateData}>
+              Retrieve Data
+            </button>
 
-        <button type="submit" onClick={handleDeleteSubmit}>
-          Submit Delete
-        </button>
+            {retrievedDataUpdate && (
+              <div className="retrieved-data">
+                <h3>Data to Update</h3>
+                {Object.entries(retrievedDataUpdate).map(([key, value]) => (
+                  <div key={key} className="data-box">
+                    <label className="data-label">
+                      {key}:
+                    </label>
+                    <input
+                      type="text"
+                      className="input data-value"
+                      value={editedDataUpdate[key]}
+                      onChange={(e) => handleEditValueUpdate(key, e.target.value)}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+            <button type="submit" onClick={handleUpdateDataSubmit}>
+              Submit Updated Data
+            </button>
 
-        <label className="query-status">
-          {latestResponseDelete}
-        </label>
-      </div>
+            <label className="query-status">
+              {latestResponseUpdate}
+            </label>
+          </div>
+
+          {/* -------------------------------- delete ----------------------------- */}
+
+          <div className="itembox">
+            <h2>This will delete an item to the selected table:</h2>
+            <select
+              className="input"
+              onChange={handleTableNameChangeDelete}
+              value={tableNameDelete}
+            >
+              <option value="consumable">consumable</option>
+              <option value="consumable_location">consumable_location</option>
+              <option value="machine">machine</option>
+              <option value="machine_location">machine_location</option>
+              <option value="non_consumable">non_consumable</option>
+              <option value="non_consumable_location">non_consumable_location</option>
+              <option value="room">room</option>
+              <option value="storage_medium">storage_medium</option>
+            </select>
+            <input
+              className="input"
+              type="text"
+              placeholder="Item ID"
+              onChange={handleItemIdDeleteChange}
+              value={itemIdDelete}
+            />
+
+            <button type="submit" onClick={handleDeleteSubmit}>
+              Submit Delete
+            </button>
+
+            <label className="query-status">
+              {latestResponseDelete}
+            </label>
+          </div>
+        </div>
+      )}
     </div>
-
   );
 }
 
