@@ -2,6 +2,7 @@ from flask import Flask, render_template, Response, request, redirect, url_for, 
 from flask_cors import CORS
 import mysql.connector
 import ast
+import password_backend
 
 BACKEND_PORT = 5001
 
@@ -10,9 +11,21 @@ CORS(app)
 
 config = {
     'host': 'localhost',
-    'user': 'Admin',
+    'user': 'admin',
     'password': 'frith',
     'database': 'frith_friends'
+}
+
+# Define a dictionary to map table names to their respective ID column names
+table_to_id_column = {
+    "consumable": "c_id",
+    "consumable_location": "c_id",
+    "machine": "m_id",
+    "machine_location": "m_id",
+    "non_consumable": "nc_id",
+    "non_consumable_location": "nc_id",
+    "room": "r_id",
+    "storage_medium": "sm_id",
 }
 
 @app.route('/')
@@ -25,16 +38,12 @@ def add():
         data = request.json
         addData = parse_dictionary(data['addData'])
 
-        print(addData)
-
         conn = mysql.connector.connect(**config)
         cursor = conn.cursor()
-
-        query = f"INSERT INTO {data['tableName']} SET {addData}"
-        print(query)
+        print(f"INSERT INTO {data['tableName']} SET {addData}")
 
         # Using parameterized query to add a specific item by its ID
-        cursor.execute(query)
+        cursor.execute(f"INSERT INTO {data['tableName']} SET {addData}")
 
         conn.commit()
         cursor.close()
@@ -46,8 +55,9 @@ def add():
 
     return jsonify(response)
 
-@app.route('/update', methods=['PUT'])
+@app.route('/update', methods=["PUT"])
 def update():
+    
     #try:
     # print(request.json)
     data = request.json
@@ -55,6 +65,8 @@ def update():
     conn = mysql.connector.connect(**config)
     cursor = conn.cursor()
     updateData = parse_dictionary(data['updateData'])
+
+    print(data)
 
     # print(updateData)
 
@@ -69,19 +81,35 @@ def update():
     #    response = {"status": "error", "message": str(e)}
     return jsonify(response)
 
-def get_item_ids(table_name):
-    # Define a dictionary to map table names to their respective ID column names
-    table_to_id_column = {
-        "consumable": "c_id",
-        "consumable_location": "c_id",
-        "machine": "m_id",
-        "machine_location": "m_id",
-        "non_consumable": "nc_id",
-        "non_consumable_location": "nc_id",
-        "room": "r_id",
-        "storage_medium": "sm_id",
-    }
 
+@app.route('/delete', methods=['DELETE'])
+def delete():
+    try:
+        print(request.json)
+        data = request.json
+        table_id_col = get_item_ids(data['tableName'])
+        delete_id = data['deleteId']
+
+        conn = mysql.connector.connect(**config)
+        cursor = conn.cursor()
+
+
+        print(f"DELETE FROM {data['tableName']} WHERE {table_id_col} = {data['deleteId']}")
+        # Using parameterized query to update a specific item by its ID
+        cursor.execute(f"DELETE FROM {data['tableName']} WHERE {table_id_col} = {data['deleteId']}")
+        conn.commit()
+        cursor.close()
+        conn.close()
+        response = {"status": "success"}
+        #except Exception as e:
+        #    response = {"status": "error", "message": str(e)}
+        return jsonify(response)
+    except Exception as e:
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)})
+
+def get_item_ids(table_name):
+    # I moved it to the top because we don't need to redefine it every time
     return table_to_id_column[table_name]
 
 @app.route('/get_data', methods=['GET'])
@@ -146,6 +174,68 @@ def parse_dictionary(dictionary):
     key_value_pairs = [f"{key} = \"{value}\"" for key, value in dictionary.items()]
     result = ', '.join(key_value_pairs)
     return result
+    
+
+@app.route('/login', methods=["POST"])
+def login():
+    data = request.json
+    enteredUsername = data['username']
+    enteredPassword = data['password']
+
+    conn = mysql.connector.connect(**config)
+    cursor = conn.cursor()
+    
+    try:
+        # Using parameterized query to update a specific item by its ID
+        cursor.execute(f"SELECT Password FROM User_Authentication WHERE Username = '{enteredUsername}'")
+        userPasswordHash = cursor.fetchone()[0];
+        if (password_backend.verify_password(userPasswordHash, enteredPassword)):
+            response = {"status": "success"}
+        else:
+            response = {"status": "error", "message": "Incorrect password"}
+
+    except Exception as e:
+        response = {"status": "error", "message": str(e)}
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return jsonify(response)
+
+@app.route('/create_user', methods=["PUT"])
+def create_user():
+    data = request.json
+
+    if data['original_password'] != data['confirm_password']:
+        return jsonify({"status": "error", "message": "Passwords do not match"})
+    
+    conn = mysql.connector.connect(**config)
+    cursor = conn.cursor()
+    try:
+        # Using parameterized query to update a specific item by its ID
+        cursor.execute(f"SELECT Username FROM User_Authentication")
+        currentUsernames = cursor.fetchall();
+        for element in currentUsernames:
+            if data['username'] in element:
+                return jsonify({"status": "error", "message": "Username already exists"})
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+    password_hash = password_backend.hash_password(data['original_password'])
+
+    try:
+        print(f"INSERT INTO User_Authentication SET Username = '{data['username']}', Password = '{password_hash}', EncryptionType = 'argon2id', PasswordExpirationDate = '2023-12-31', UserIsLoggedIn = 0, UserType = '{data['account_type']}'")
+        cursor.execute(f"INSERT INTO User_Authentication SET Username = '{data['username']}', Password = '{password_hash}', EncryptionType = 'argon2id', PasswordExpirationDate = '2023-12-31', UserIsLoggedIn = 0, UserType = '{data['account_type']}'")
+        response = {"status": "success"}
+
+    except Exception as e:
+        response = {"status": "error", "message": str(e)}
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return jsonify(response)
 
 if __name__ == '__main__':
     app.run(debug=True, port=BACKEND_PORT)
