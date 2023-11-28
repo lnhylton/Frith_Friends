@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 import LoginForm from './login'; // Assuming the login file is in the same directory
-
+import FrithLogo from './components/frith_logo.jsx'
 const BACKEND_PORT = 5001
 
 function App() {
@@ -184,6 +184,7 @@ function App() {
   /* -------------------------------------------------------------------------- */
 
   return (
+    
     <div className="App">
       {!loggedIn ? (
         <button className="login-button" onClick={handleLogin}>
@@ -198,7 +199,7 @@ function App() {
       ) : (
         <div>
           <div className="App-header">
-            <h1>Frith Friends</h1>
+              <FrithLogo className="FrithLogo"/>Frith Inventory
           </div>
 
           {/* -------------------------------- add -------------------------------- */}
