@@ -1,4 +1,10 @@
 import { useState, useEffect } from 'react';
+import React from "react";
+import { Link, Routes, Route } from "react-router-dom"
+
+import Guest from "./pages/Guest"
+import ULA from "./pages/ULA"
+import Admin from "./pages/Admin"
 import './App.css';
 import LoginForm from './login'; // Assuming the login file is in the same directory
 import FrithLogo from './components/frith_logo.jsx'
@@ -184,8 +190,29 @@ function App() {
   /* -------------------------------------------------------------------------- */
 
   return (
-    
     <div className="App">
+      <nav>
+        <ul>
+          <li>
+            <Link to="/">Guest</Link>
+          </li>
+          <li>
+            <Link to="/ula">ULA</Link>
+          </li>
+          <li>
+            <Link to="/admin">Admin</Link>
+          </li>
+        </ul>
+
+        <hr />
+      </nav>
+      <Routes>
+        <Route path="/" element={<Guest/>}/>
+        <Route path="/ula" element={<ULA/>}/>
+        <Route path="/admin" element={<Admin/>}/> 
+      </Routes>
+
+
       {!loggedIn ? (
         <button className="login-button" onClick={handleLogin}>
           Login Page
@@ -199,7 +226,7 @@ function App() {
       ) : (
         <div>
           <div className="App-header">
-              <FrithLogo className="FrithLogo"/>Frith Inventory
+            <FrithLogo className="FrithLogo" />Frith Inventory
           </div>
 
           {/* -------------------------------- add -------------------------------- */}
@@ -219,6 +246,7 @@ function App() {
               <option value="non_consumable_location">non_consumable_location</option>
               <option value="room">room</option>
               <option value="storage_medium">storage_medium</option>
+              <option value="storage_medium_location">storage_medium_location</option>
             </select>
 
             <button type="submit" onClick={handleRetrieveAddData}>
@@ -269,6 +297,7 @@ function App() {
               <option value="non_consumable_location">non_consumable_location</option>
               <option value="room">room</option>
               <option value="storage_medium">storage_medium</option>
+              <option value="storage_medium_location">storage_medium_location</option>
             </select>
             <input
               className="input"
@@ -326,6 +355,7 @@ function App() {
               <option value="non_consumable_location">non_consumable_location</option>
               <option value="room">room</option>
               <option value="storage_medium">storage_medium</option>
+              <option value="storage_medium_location">storage_medium_location</option>
             </select>
             <input
               className="input"

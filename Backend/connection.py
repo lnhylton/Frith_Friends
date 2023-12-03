@@ -11,7 +11,7 @@ CORS(app)
 
 config = {
     'host': 'localhost',
-    'user': 'admin',
+    'user': 'Admin',
     'password': 'frith',
     'database': 'frith_friends'
 }
