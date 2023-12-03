@@ -3,6 +3,7 @@ from flask_cors import CORS
 import mysql.connector
 import ast
 import password_backend
+from datetime import datetime
 
 BACKEND_PORT = 5001
 
@@ -11,7 +12,7 @@ CORS(app)
 
 config = {
     'host': 'localhost',
-    'user': 'admin',
+    'user': 'Admin',
     'password': 'frith',
     'database': 'frith_friends'
 }
@@ -45,40 +46,69 @@ def add():
         # Using parameterized query to add a specific item by its ID
         cursor.execute(f"INSERT INTO {data['tableName']} SET {addData}")
 
+         # Get timestamp value and adding it to the data
+        tableName = data['tableName'] 
+        changeDataDict = data['addData']
+        current_timestamp = datetime.now()
+        formatted_timestamp = current_timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        changeDataDict['change_timestamp'] = formatted_timestamp
+
+        # # Convert data into sql format and get new table name
+        changeData = parse_dictionary(changeDataDict)
+        tableName+="_changes"
+
+        # Insert data into database
+        print(f"INSERT INTO {tableName} SET {changeData}");
+        cursor.execute(f"INSERT INTO {tableName} SET {changeData}")
+
         conn.commit()
-        cursor.close()
-        conn.close()
+        
         response = {"status": "success"}
 
     except Exception as e:
         response = {"status": "error", "message": str(e)}
+    finally:
+        cursor.close()
+        conn.close()
 
     return jsonify(response)
 
 @app.route('/update', methods=["PUT"])
-def update():
-    
-    #try:
-    # print(request.json)
-    data = request.json
-    table_id_col = get_item_ids(data['tableName'])
-    conn = mysql.connector.connect(**config)
-    cursor = conn.cursor()
-    updateData = parse_dictionary(data['updateData'])
+def update(): 
+    try:
+        # print(request.json)
+        data = request.json
+        table_id_col = get_item_ids(data['tableName'])
+        conn = mysql.connector.connect(**config)
+        cursor = conn.cursor()
+        updateData = parse_dictionary(data['updateData'])
 
-    print(data)
+        print(f"UPDATE {data['tableName']} SET {updateData} WHERE {table_id_col} = {data['itemId']}")
+        # Using parameterized query to update a specific item by its ID
+        cursor.execute(f"UPDATE {data['tableName']} SET {updateData} WHERE {table_id_col} = {data['itemId']}")
 
-    # print(updateData)
+        # Get timestamp value and adding it to the data
+        tableName = data['tableName'] 
+        changeDataDict = data['updateData']
+        current_timestamp = datetime.now()
+        formatted_timestamp = current_timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        changeDataDict['change_timestamp'] = formatted_timestamp
 
-    print(f"UPDATE {data['tableName']} SET {updateData} WHERE {table_id_col} = {data['itemId']}")
-    # Using parameterized query to update a specific item by its ID
-    cursor.execute(f"UPDATE {data['tableName']} SET {updateData} WHERE {table_id_col} = {data['itemId']}")
-    conn.commit()
-    cursor.close()
-    conn.close()
-    response = {"status": "success"}
-    #except Exception as e:
-    #    response = {"status": "error", "message": str(e)}
+        # # Convert data into sql format and get new table name
+        changeData = parse_dictionary(changeDataDict)
+        tableName+="_changes"
+
+        # Insert data into database
+        print(f"INSERT INTO {tableName} SET {changeData}");
+        cursor.execute(f"INSERT INTO {tableName} SET {changeData}")
+        
+        conn.commit()
+        response = {"status": "success"}
+    except Exception as e:
+        response = {"status": "error", "message": str(e)}
+    finally:
+        cursor.close()
+        conn.close()
     return jsonify(response)
 
 
