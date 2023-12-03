@@ -128,6 +128,7 @@ function App() {
         .then((data) => {
           setRetrievedDataUpdate(data.data);
           setEditedDataUpdate(data.data);
+          console.log(data.data);
         })
         .catch((e) => {
           setLatestResponseUpdate("failed");

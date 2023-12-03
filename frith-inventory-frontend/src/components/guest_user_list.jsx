@@ -11,8 +11,7 @@ const InventoryList = (props) => {
     const {
         data,
         className,
-        selected,
-        setSelected
+        onClick
     } = props;
 
     const customToolbar = () => {
@@ -21,10 +20,6 @@ const InventoryList = (props) => {
                 <GridToolbarExport />
             </GridToolbarContainer>
         )
-    }
-
-    const handleOnSelectedRow = (newSelectedItems) => {
-        setSelected(newSelectedItems)
     }
 
     const rows = data
@@ -45,8 +40,6 @@ const InventoryList = (props) => {
                     slots={
                         { toolbar: customToolbar() }
                     }
-                    onRowSelectionModelChange={handleOnSelectedRow}
-                    rowSelectionModel={selected}
                 />
             </Box>
         </>

@@ -3,7 +3,6 @@
  * version: 4/16/2023
  */
 import React from 'react';
-import GuestList from '../components/guest_user_list';
 
 const ULA = () => {
     return (
