@@ -11,7 +11,6 @@ import DeleteUserForm from './components/delete_user.jsx';
 import DeleteForm from './components/delete.jsx';
 import AddForm from './components/add.jsx';
 
-import StatForm from './stats.jsx'; // Assuming the login file is in the same directory
 import ScatterPlot from './components/scatterplot.jsx';
 
 
@@ -230,23 +229,37 @@ function App() {
   const getTableData = () => {
     const tableNameFilter = [tableFilter]
     if (tableNameFilter) {
-      fetch(`http://localhost:${BACKEND_PORT}/get_table_data`, {
-        method: "PUT",
-        body: JSON.stringify({
-          tableName: tableNameFilter
-        }),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8"
-        }
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          setTableData(data.data)
-          console.log(data.data)
+      if (tableNameFilter.includes(["consumables", "non_consumables", "machines"]))
+        fetch(`http://localhost:${BACKEND_PORT}/get_table_data`, {
+          method: "PUT",
+          body: JSON.stringify({
+            tableName: tableNameFilter
+          }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8"
+          }
         })
-        .catch((e) => {
-          console.log("failed")
-        });
+          .then((response) => response.json())
+          .then((data) => {
+            setTableData(data.data)
+            console.log(data.data)
+          })
+          .catch((e) => {
+            console.log("failed")
+          });
+      else {
+        fetch(`http://localhost:${BACKEND_PORT}/get_table?table_name=${tableFilter}`, {
+          method: "GET"
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            setTableData(data.data)
+            console.log(data.data)
+          })
+          .catch((e) => {
+            console.log("failed")
+          });
+      }
     }
   };
 
@@ -416,7 +429,7 @@ function App() {
               Login
             </button>
             :
-            <NavLink className="login-button" to="/" onClick={handleLogout}>
+            <NavLink className="logout-button" to="/" onClick={handleLogout}>
               Logout
             </NavLink>
           }
@@ -448,6 +461,27 @@ function App() {
             <option value="non_consumable">non_consumable</option>
             <option value="machine">machine</option>
           </select>
+
+          <select
+            className="input-filter"
+            onChange={handleTableFilterChange}
+            value={tableFilter}
+            style={{
+              visibility: validateUser(loggedInUsers) > 1 ? '' : 'hidden'
+            }}
+          >
+            <option value="consumable_changes">consumable_changes</option>
+            <option value="consumable_location">consumable_location</option>
+            <option value="machine_changes">machine_changes</option>
+            <option value="machine_location">machine_location</option>
+            <option value="non_consumable_changes">non_consumable_changes</option>
+            <option value="non_consumable_location">non_consumable_location</option>
+            <option value="room">room</option>
+            <option value="storage_medium">storage_medium</option>
+            <option value="storage_medium_location">storage_medium_location</option>
+            <option value="user_authentication">user_authentication</option>
+          </select>
+
 
           {/* ---------------------------- navigation ----------------------------- */}
 

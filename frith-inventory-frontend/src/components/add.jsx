@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import "../App.css"
 
 const BACKEND_PORT = 5001;
 
@@ -58,7 +59,6 @@ const AddForm = ({ onBack }) => {
   };
 
   return (
-    <div className="App">
       <div className="itembox">
         <h2>Add an item to the table selected</h2>
         <select
@@ -109,7 +109,6 @@ const AddForm = ({ onBack }) => {
           {latestResponseAdd}
         </label>
       </div>
-    </div>
   );
 };
 

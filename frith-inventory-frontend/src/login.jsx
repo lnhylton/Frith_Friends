@@ -1,8 +1,4 @@
 import React, { useState } from 'react';
-import {
-    createBrowserRouter,
-    RouterProvider,
-} from "react-router-dom";
 
 const BACKEND_PORT = 5001;
 
@@ -54,40 +50,38 @@ const LoginForm = ({ onLogin, onBack }) => {
     };
 
     return (
-        <div className="App">
-            <div className="itembox">
-                <h2>Login</h2>
-                <div key="login_username" className="data-box">
-                    <label className="data-label">Username:</label>
-                    <input
-                        type="text"
-                        className="input data-value"
-                        value={loginUsername}
-                        onChange={handleLoginUsernameChange}
-                    />
-                </div>
-                <div key="login_password" className="data-box">
-                    <label className="data-label">Password:</label>
-                    <input
-                        type={loginPasswordVisible ? 'text' : 'password'}
-                        className="input data-value"
-                        value={loginPassword}
-                        onChange={handleLoginPasswordChange}
-                    />
-                </div>
-                <div key="login_password_visible" className="data-box">
-                    <label className="data-label">
-                        Show Password
-                        <input
-                            type="checkbox"
-                            onChange={handleLoginPasswordVisibleChange}
-                        />
-                    </label>
-                </div>
-                <button onClick={handleLogin}>Login</button>
-                <button onClick={handleBack}>Back</button>
-                {loginResult && <p>{loginResult}</p>}
+        <div className="itembox">
+            <h2>Login</h2>
+            <div key="login_username" className="data-box">
+                <label className="data-label">Username:</label>
+                <input
+                    type="text"
+                    className="input data-value"
+                    value={loginUsername}
+                    onChange={handleLoginUsernameChange}
+                />
             </div>
+            <div key="login_password" className="data-box">
+                <label className="data-label">Password:</label>
+                <input
+                    type={loginPasswordVisible ? 'text' : 'password'}
+                    className="input data-value"
+                    value={loginPassword}
+                    onChange={handleLoginPasswordChange}
+                />
+            </div>
+            <div key="login_password_visible" className="data-box">
+                <label className="data-label">
+                    Show Password
+                    <input
+                        type="checkbox"
+                        onChange={handleLoginPasswordVisibleChange}
+                    />
+                </label>
+            </div>
+            <button onClick={handleLogin}>Login</button>
+            <button onClick={handleBack}>Back</button>
+            {loginResult && <p>{loginResult}</p>}
         </div>
     );
 };

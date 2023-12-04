@@ -25,7 +25,6 @@ const ScatterPlot = ({ data , stat}) => {
         yDomainOrder  = ['out', 'low', 'in stock'];
       }
 
-  
 
     // Create scales
     const xScale = d3.scaleTime()

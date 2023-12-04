@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import "../App.css"
 
 const BACKEND_PORT = 5001;
 
@@ -43,9 +44,8 @@ const DeleteForm = ({ onBack }) => {
   };
 
   return (
-    <div className="App">
       <div className="itembox">
-        <h2>This will delete an item to the selected table:</h2>
+        <h2>This will delete an item from the selected table:</h2>
         <select
           className="input"
           onChange={handleTableNameChangeDelete}
@@ -78,7 +78,6 @@ const DeleteForm = ({ onBack }) => {
           {latestResponseDelete}
         </label>
       </div>
-    </div>
   );
 };
 

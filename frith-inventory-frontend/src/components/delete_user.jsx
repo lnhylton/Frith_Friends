@@ -36,22 +36,20 @@ const DeleteUserForm = ({ onDelete, onBack }) => {
     };
 
     return (
-        <div className="App">
-            <div className="itembox">
-                <h2>Delete User</h2>
-                <div key="delete_username" className="data-box">
-                    <label className="data-label">Username:</label>
-                    <input
-                        type="text"
-                        className="input data-value"
-                        value={deleteUsername}
-                        onChange={handleDeleteUsernameChange}
-                    />
-                </div>
-                <button onClick={handleDeleteUser}>Delete User</button>
-                <button onClick={handleBack}>Back</button>
-                {deleteUserResult && <p>{deleteUserResult}</p>}
+        <div className="itembox">
+            <h2>Delete User</h2>
+            <div key="delete_username" className="data-box">
+                <label className="data-label">Username:</label>
+                <input
+                    type="text"
+                    className="input data-value"
+                    value={deleteUsername}
+                    onChange={handleDeleteUsernameChange}
+                />
             </div>
+            <button onClick={handleDeleteUser}>Delete User</button>
+            <button onClick={handleBack}>Back</button>
+            {deleteUserResult && <p>{deleteUserResult}</p>}
         </div>
     );
 };

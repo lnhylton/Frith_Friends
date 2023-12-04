@@ -2,7 +2,7 @@
  * author: Colton Tshudy
  * version: 4/16/2023
  */
-import { DataGrid, GridToolbarContainer, GridToolbarExport } from "@mui/x-data-grid";
+import { DataGrid } from "@mui/x-data-grid";
 import { Box } from "@mui/material";
 import React from 'react';
 import "../style/table.css"

@@ -59,60 +59,58 @@ const CreateUserForm = ({ onCreate, onBack }) => {
     };
 
     return (
-        <div className="App">
-            <div className="itembox">
-                <h2>Create User</h2>
-                <div key="create_username" className="data-box">
-                    <label className="data-label">Username:</label>
-                    <input
-                        type="text"
-                        className="input data-value"
-                        value={createUsername}
-                        onChange={handleCreateUsernameChange}
-                    />
-                </div>
-                <div key="create_password" className="data-box">
-                    <label className="data-label">Password:</label>
-                    <input
-                        type={createPasswordVisible ? 'text' : 'password'}
-                        className="input data-value"
-                        value={createOriginalPassword}
-                        onChange={handleCreateOriginalPasswordChange}
-                    />
-                </div>
-                <div key="create_confirm_password" className="data-box">
-                    <label className="data-label">Confirm Password:</label>
-                    <input
-                        type={createPasswordVisible ? 'text' : 'password'}
-                        className="input data-value"
-                        value={createConfirmPassword}
-                        onChange={handleCreateConfirmPasswordChange}
-                    />
-                </div>
-                <div key="create_account_type" className="data-box">
-                    <label className="data-label">Account Type:</label>
-                    <select
-                        className="input"
-                        onChange={handleCreateAccountTypeChange}
-                        value={createAccountType}
-                    >
-                        <option value="ULA">ULA</option>
-                        <option value="Admin">Admin</option>
-                    </select>
-                </div>
-                <div key="create_password_visible" className="data-box">
-                    <label className="data-label">
-                        Show Password
-                        <input
-                            type="checkbox"
-                            onChange={handleCreatePasswordVisibleChange}
-                        />
-                    </label>
-                </div>
-                <button onClick={handleCreateUser}>Create User</button>
-                <button onClick={handleBack}>Back</button>
-                {createUserResult && <p>{createUserResult}</p>}
+        <div className="itembox">
+            <h2>Create User</h2>
+            <div key="create_username" className="data-box">
+                <label className="data-label">Username:</label>
+                <input
+                    type="text"
+                    className="input data-value"
+                    value={createUsername}
+                    onChange={handleCreateUsernameChange}
+                />
             </div>
+            <div key="create_password" className="data-box">
+                <label className="data-label">Password:</label>
+                <input
+                    type={createPasswordVisible ? 'text' : 'password'}
+                    className="input data-value"
+                    value={createOriginalPassword}
+                    onChange={handleCreateOriginalPasswordChange}
+                />
+            </div>
+            <div key="create_confirm_password" className="data-box">
+                <label className="data-label">Confirm Password:</label>
+                <input
+                    type={createPasswordVisible ? 'text' : 'password'}
+                    className="input data-value"
+                    value={createConfirmPassword}
+                    onChange={handleCreateConfirmPasswordChange}
+                />
+            </div>
+            <div key="create_account_type" className="data-box">
+                <label className="data-label">Account Type:</label>
+                <select
+                    className="input"
+                    onChange={handleCreateAccountTypeChange}
+                    value={createAccountType}
+                >
+                    <option value="ULA">ULA</option>
+                    <option value="Admin">Admin</option>
+                </select>
+            </div>
+            <div key="create_password_visible" className="data-box">
+                <label className="data-label">
+                    Show Password
+                    <input
+                        type="checkbox"
+                        onChange={handleCreatePasswordVisibleChange}
+                    />
+                </label>
+            </div>
+            <button onClick={handleCreateUser}>Create User</button>
+            <button onClick={handleBack}>Back</button>
+            {createUserResult && <p>{createUserResult}</p>}
         </div>
     );
 };
