@@ -529,7 +529,7 @@ function App() {
             ) : (
               <div>
                 <h1>Scatter Plot</h1>
-                <ScatterPlot data={changeData} />
+                <ScatterPlot data={changeData} stat={selectStat} />
               </div>
             )}
           </div>
