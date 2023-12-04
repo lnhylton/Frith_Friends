@@ -238,8 +238,8 @@ function App() {
     fetch(`http://localhost:${BACKEND_PORT}/update`, {
       method: "PUT",
       body: JSON.stringify({
-        tableName: tableNameUpdate,
-        itemId: itemIdUpdate,
+        tableName: tableFilter,
+        itemId: editID.id,
         updateData: editedDataUpdate
       }),
       headers: {

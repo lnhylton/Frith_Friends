@@ -17,10 +17,10 @@ const InventoryList = (props) => {
     } = props;
 
     const handler = (params) => {
-        console.log(params.row)
         for (const [key, value] of Object.entries(params.row)) {
-            if (key.indexOf("id") > 0) {
+            if (key.indexOf("_id") > 0) {
                 setEditID({id: value, disp: true})
+                console.log(id)
                 return;
             }
         }
