@@ -6,7 +6,7 @@ const ScatterPlot = ({ data , stat}) => {
 
   useEffect(() => {
     // Set up the SVG container
-    const margin = { top: 20, right: 20, bottom: 75, left: 45 };
+    const margin = { top: 20, right: 20, bottom: 90, left: 45 };
     const width = 500 - margin.left - margin.right;
     const height = 400 - margin.top - margin.bottom;
 
@@ -16,37 +16,54 @@ const ScatterPlot = ({ data , stat}) => {
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    yDomainOrder = [];
-    if(stat == "stock"){
-      yDomainOrder = ['out', 'low', 'in stock'];
-    }
-    else if(stat == "hidden" || stat == "functional"){
-      yDomainOrder = [0, 1];
-    }
-    else if(stat == "inventory"){
-      yDomainOrder = data.map(d => d.y);
-    }
+      var yDomainOrder = [];
+      if (stat === "stock") {
+        yDomainOrder = ['out', 'low', 'in stock'];
+      } else if (stat === "hidden" || stat === "functional") {
+        yDomainOrder = [0, 1];
+      } else if (stat === "inventory") {
+        yDomainOrder  = ['out', 'low', 'in stock'];
+      }
+
+  
+
     // Create scales
     const xScale = d3.scaleTime()
       .domain(d3.extent(data, d => new Date(d.x)))
       .range([0, width]);
 
-    const yScale = d3.scaleBand()
-      .domain(yDomainOrder)
-      .range([height, 0])
-      .padding(0.1);
+      let yScale;
 
+      if (yDomainOrder.length > 0) {
+        yScale = d3.scaleBand()
+          .domain(yDomainOrder)
+          .range([height, 0])
+          .padding(0.1);
+      } else {
+        yScale = d3.scaleLinear()
+          .domain(d3.extent(data, d => d.y))
+          .range([height, 0]);
+      }
+      
+      svg.selectAll('circle').remove();
+      svg.selectAll('.x-axis').remove();
+      svg.selectAll('.y-axis').remove();
     // Draw circles (scatter plot points)
+
     svg.selectAll('circle')
       .data(data)
       .enter().append('circle')
       .attr('cx', d => xScale(new Date(d.x)))
-      .attr('cy', d => yScale(d.y) + yScale.bandwidth() / 2)
+      .attr('cy', d => yScale(d.y) - 50)
       .attr('r', 5)
       .style('fill', 'steelblue');
 
+
+
+
     // Create axes
     const xAxis = d3.axisBottom(xScale)
+    .tickValues(data.map(d => new Date(d.x)))
     .tickFormat(d3.timeFormat('%Y-%m-%d %H:%M:%S'))
     .tickPadding(10) // Adjust the padding between ticks and labels
     .tickSize(0) // Set tick size to 0 to hide ticks initially
@@ -57,6 +74,7 @@ const ScatterPlot = ({ data , stat}) => {
   
     svg.append('g')
       .attr('transform', `translate(0,${height})`)
+      .attr('class', 'x-axis')
       .call(xAxis)
       .selectAll("text")
       .style("text-anchor", "end")
@@ -65,6 +83,7 @@ const ScatterPlot = ({ data , stat}) => {
       .attr("transform", "rotate(-65)");
 
     svg.append('g')
+        .attr('class', 'y-axis')
       .call(yAxis);
 
   }, [data]);
