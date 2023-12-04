@@ -10,10 +10,7 @@
 2) pip install flask_cors
 3) pip install mysql-connector-python
 4) pip install argon2-cffi
-5) pip install pandas
-6) pip install matplotlib
-7) py ./Backend/connection.py
-8) py ./Backend/connection.py
+5) py ./Backend/connection.py
 
 ### How to use update function (10/31/23)
 1) Choose your table
