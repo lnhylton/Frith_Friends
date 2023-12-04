@@ -4,7 +4,7 @@ import { NavLink, Routes, Route } from "react-router-dom"
 
 import InventoryList from './components/data_list.jsx';
 import './App.css';
-import LoginForm from './login'; // Assuming the login file is in the same directory
+import LoginForm from './login.jsx'; // Assuming the login file is in the same directory
 import FrithLogo from './components/frith_logo.jsx'
 const BACKEND_PORT = 5001
 
@@ -28,6 +28,7 @@ function App() {
   const [tableData, setTableData] = useState({});
   const [tableFilter, setTableFilter] = useState("consumable");
 
+  const [waitLogin, setWaitLogin] = useState(false); // Login state
   const [loggedIn, setLoggedIn] = useState(false); // Login state
   const [loggedInUsers, setLoggedInUsers] = useState({});
 
@@ -96,11 +97,12 @@ function App() {
   /* -------------------------------------------------------------------------- */
 
   const handleBackToMainContent = () => {
-    setLoggedIn(false);
+    setLoggedIn(true);
+    setWaitLogin(false);
   };
 
   const handleLogin = () => {
-    setLoggedIn(true);
+    setWaitLogin(true);
   };
 
   const handleLogout = () => {
@@ -110,15 +112,15 @@ function App() {
         "Content-type": "application/json; charset=UTF-8"
       }
     })
-      .then((response) => response.json())
-      .then((data) => {
-        setLoggedInUsers({})
-        setLoggedIn(false);
-        console.log(data)
-      })
-      .catch((e) => {
-        console.log("failed")
-      });
+    .then((response) => response.json())
+    .then((data) => {
+      setLoggedIn(false)
+      console.log(data)
+      getLoggedInUsers()
+    })
+    .catch((e) => {
+      console.log("failed")
+    });
   };
 
   const getLoggedInUsers = () => {
@@ -292,9 +294,9 @@ function App() {
       </div>
 
       {
-        loggedIn ?
+        waitLogin ?
           <div className="popup">
-            <LoginForm onBack={() => handleBackToMainContent} />
+            <LoginForm onLogin={handleBackToMainContent} onBack={handleBackToMainContent} />
           </div>
           :
           <></>

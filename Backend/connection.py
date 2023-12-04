@@ -12,7 +12,7 @@ CORS(app)
 
 config = {
     'host': 'localhost',
-    'user': 'Admin',
+    'user': 'admin',
     'password': 'frith',
     'database': 'frith_friends'
 }
@@ -215,7 +215,6 @@ def login():
     data = request.json
     enteredUsername = data['username']
     enteredPassword = data['password']
-
     conn = mysql.connector.connect(**config)
     cursor = conn.cursor()
     
@@ -232,7 +231,6 @@ def login():
 
     except Exception as e:
         response = {"status": "error", "message": str(e)}
-
     conn.commit()
     cursor.close()
     conn.close()

@@ -64,7 +64,7 @@ const LoginForm = ({ onLogin, onBack }) => {
         })
             .then((response) => response.json())
             .then((res) => {
-                setLatestResponseLogin(res.message);
+                //setLatestResponseLogin(res.message);
                 console.log(res);
                 if (res.status === 'success') {
                     // Notify the parent component about the successful login
