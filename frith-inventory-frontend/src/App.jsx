@@ -37,7 +37,8 @@ function App() {
 
   useEffect(() => {
     // Runs on mount
-    getTableData()
+    getTableData() 
+    getLoggedInUsers()
 
     // Runs on dismount
     return () => {
@@ -96,6 +97,24 @@ function App() {
 
   const handleLogout = () => {
     setLoggedIn(false);
+  };
+
+  const getLoggedInUsers = () => {
+    fetch(`http://localhost:${BACKEND_PORT}/get_logged_in_users`, {
+      method: "GET",
+      headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      }
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      setTableData(data.data)
+      console.log(data.data)
+    })
+    .catch((e) => {
+      console.log("failed")
+    });
+    
   };
 
   /* -------------------------------------------------------------------------- */

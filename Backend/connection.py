@@ -285,7 +285,6 @@ def get_table_data():
         # Use a parameterized query to retrieve data from the specified table and row
         data = []
         for table in table_name:
-            print(table)
             cursor.execute(f"""WITH RECURSIVE Storage_Medium_Path AS (
             SELECT
                 child_sm_id,
@@ -307,6 +306,7 @@ def get_table_data():
             FROM (
             SELECT
                 c.*,
+                cl.sm_id,
                 smp.parent_ids,
                 ROW_NUMBER() OVER (PARTITION BY c.{get_item_ids(table)} ORDER BY LENGTH(smp.parent_ids) DESC) AS rn
             FROM {table} c
@@ -321,14 +321,27 @@ def get_table_data():
 
             # Convert rows to a list of dictionaries
             data += [dict(zip(column_names, row)) for row in rows]
-        print(data)
 
         conn.close()
 
         return jsonify({"status": "success", "data": data})
     except Exception as e:
         conn.close()
-        print(str(e))
+        return jsonify({"status": "error", "message": str(e)})
+    
+@app.route('/get_logged_in_users', methods=['GET'])
+def get_logged_in_users():
+    conn = mysql.connector.connect(**config)
+    cursor = conn.cursor()
+    
+    try:
+        # Use a parameterized query to retrieve data from the specified table and row
+        cursor.execute(f'SELECT Username FROM user_authentication WHERE UserIsLoggedIn = 1;')
+        users = cursor.fetchall()
+        conn.close()
+        return jsonify({"status": "success", "data": users})
+    except Exception as e:
+        conn.close()
         return jsonify({"status": "error", "message": str(e)})
 
 if __name__ == '__main__':
