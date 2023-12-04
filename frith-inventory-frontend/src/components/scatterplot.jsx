@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-const ScatterPlot = ({ data }) => {
+const ScatterPlot = ({ data , stat}) => {
   const svgRef = useRef();
 
   useEffect(() => {
@@ -16,13 +16,23 @@ const ScatterPlot = ({ data }) => {
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
+    yDomainOrder = [];
+    if(stat == "stock"){
+      yDomainOrder = ['out', 'low', 'in stock'];
+    }
+    else if(stat == "hidden" || stat == "functional"){
+      yDomainOrder = [0, 1];
+    }
+    else if(stat == "inventory"){
+      yDomainOrder = data.map(d => d.y);
+    }
     // Create scales
     const xScale = d3.scaleTime()
       .domain(d3.extent(data, d => new Date(d.x)))
       .range([0, width]);
 
     const yScale = d3.scaleBand()
-      .domain(data.map(d => d.y))
+      .domain(yDomainOrder)
       .range([height, 0])
       .padding(0.1);
 
