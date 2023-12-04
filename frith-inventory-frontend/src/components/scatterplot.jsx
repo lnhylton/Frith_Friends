@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-const ScatterPlot = ({ data }) => {
+const ScatterPlot = ({ data , stat}) => {
   const svgRef = useRef();
 
   useEffect(() => {
     // Set up the SVG container
-    const margin = { top: 20, right: 20, bottom: 40, left: 40 };
+    const margin = { top: 20, right: 20, bottom: 75, left: 45 };
     const width = 500 - margin.left - margin.right;
     const height = 400 - margin.top - margin.bottom;
 
@@ -16,13 +16,23 @@ const ScatterPlot = ({ data }) => {
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
+    yDomainOrder = [];
+    if(stat == "stock"){
+      yDomainOrder = ['out', 'low', 'in stock'];
+    }
+    else if(stat == "hidden" || stat == "functional"){
+      yDomainOrder = [0, 1];
+    }
+    else if(stat == "inventory"){
+      yDomainOrder = data.map(d => d.y);
+    }
     // Create scales
     const xScale = d3.scaleTime()
       .domain(d3.extent(data, d => new Date(d.x)))
       .range([0, width]);
 
     const yScale = d3.scaleBand()
-      .domain(data.map(d => d.y))
+      .domain(yDomainOrder)
       .range([height, 0])
       .padding(0.1);
 
@@ -36,12 +46,23 @@ const ScatterPlot = ({ data }) => {
       .style('fill', 'steelblue');
 
     // Create axes
-    const xAxis = d3.axisBottom(xScale);
+    const xAxis = d3.axisBottom(xScale)
+    .tickFormat(d3.timeFormat('%Y-%m-%d %H:%M:%S'))
+    .tickPadding(10) // Adjust the padding between ticks and labels
+    .tickSize(0) // Set tick size to 0 to hide ticks initially
+    .tickSizeInner(0) // Set inner tick size to 0
+    .tickSizeOuter(0); // Set outer tick size to 0
     const yAxis = d3.axisLeft(yScale);
 
+  
     svg.append('g')
       .attr('transform', `translate(0,${height})`)
-      .call(xAxis);
+      .call(xAxis)
+      .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", ".15em")
+      .attr("transform", "rotate(-65)");
 
     svg.append('g')
       .call(yAxis);

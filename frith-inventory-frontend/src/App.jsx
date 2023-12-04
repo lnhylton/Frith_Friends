@@ -55,7 +55,7 @@ function App() {
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loggedIn, tableFilter, itemToEdit]);
+  }, [loggedIn, tableFilter, itemToEdit, deleteAppear, addAppear]);
 
   /* -------------------------------------------------------------------------- */
   /*                                  Handlers                                  */
@@ -68,7 +68,7 @@ function App() {
   const handleTableFilterChange = (event) => {
     setTableFilter(event.target.value);
   };
-/* -------------------------------------------------------------------------- */
+  /* -------------------------------------------------------------------------- */
   /*                                   Stat                                     */
   /* -------------------------------------------------------------------------- */
 
@@ -84,22 +84,22 @@ function App() {
 
 
   const handleTableNameChange = (event) => {
-      const selectedTableName = event.target.value;
+    const selectedTableName = event.target.value;
 
-      if (!selectedTableName) {
-        setValueOptions([]);
+    if (!selectedTableName) {
+      setValueOptions([]);
 
-      }
-      setSelectedItem("");
-      setSelectedStat("");
+    }
+    setSelectedItem("");
+    setSelectedStat("");
 
-      setTableName(selectedTableName);
+    setTableName(selectedTableName);
   }
 
   const handleItemChange = (event) => {
-      const selectedValue = event.target.value;
-      setSelectedItem(selectedValue);
-      setChangeData({});
+    const selectedValue = event.target.value;
+    setSelectedItem(selectedValue);
+    setChangeData({});
 
   };
 
@@ -117,17 +117,17 @@ function App() {
   }, [tableName]);
 
   // Check conditions to determine if the button should be disabled
-  const isButtonDisabled = tableName === '' || tableName === null || 
-  selectItem === '' || selectItem === null ||
-  selectStat === '' || selectStat === null;
+  const isButtonDisabled = tableName === '' || tableName === null ||
+    selectItem === '' || selectItem === null ||
+    selectStat === '' || selectStat === null;
 
-    const handleButtonClick = () => {
-      //generate the graph
-      console.log("Clicked the button")
-      // Query the database to see if there is data to display as statistics
-      fetchChanges();
-      // There needs to be two points of data to display
-    };
+  const handleButtonClick = () => {
+    //generate the graph
+    console.log("Clicked the button")
+    // Query the database to see if there is data to display as statistics
+    fetchChanges();
+    // There needs to be two points of data to display
+  };
 
   const fetchItems = () => {
     if (tableName) {
@@ -140,7 +140,7 @@ function App() {
         .catch((e) => {
           latestResponseAdd("failed");
         });
-      }
+    }
   };
 
   const fetchChanges = () => {
@@ -154,7 +154,7 @@ function App() {
         .catch((e) => {
           latestResponseAdd("failed");
         });
-     }
+    }
   };
 
   /* -------------------------------------------------------------------------- */
@@ -206,10 +206,6 @@ function App() {
         console.log("failed")
       });
   };
-
-  /* -------------------------------------------------------------------------- */
-  /*                                 Data List                                  */
-  /* -------------------------------------------------------------------------- */
 
   const handleCreateUser = () => {
     setCreateUserAppear(true);
@@ -392,54 +388,58 @@ function App() {
           <NavLink style={({ isActive }) => ({
             color: isActive ? '#fff' : '',
             background: isActive ? '#888' : '',
-            pointerEvents: validateUser(loggedInUsers[0]) > 0 ? '' : 'none'
+            pointerEvents: validateUser(loggedInUsers) > 0 ? '' : 'none'
           })} to="/ula">
             ULA
           </NavLink>
           <NavLink style={({ isActive }) => ({
             color: isActive ? '#fff' : '',
             background: isActive ? '#888' : '',
-            pointerEvents: validateUser(loggedInUsers[0]) > 1 ? '' : 'none'
+            pointerEvents: validateUser(loggedInUsers) > 1 ? '' : 'none'
           })} to="/admin">
             Admin
           </NavLink>
-          {!loggedIn ?
-            <button className="login-button" onClick={handleLogin}>
-              Login
-            </button>
-            :
-            <NavLink className="login-button" to="/" onClick={handleLogout}>
-              Logout
-            </NavLink>
+
+          <div className="login-zone">
+            {!loggedIn ?
+              <button className="login-button" onClick={handleLogin}>
+                Login
+              </button>
+              :
+              <NavLink className="login-button" to="/" onClick={handleLogout}>
+                Logout
+              </NavLink>
             }
 
-          <button className="login-button" onClick={handleCreateUser}>
-            Create User
-          </button>
+            <button className="login-button" onClick={handleCreateUser}>
+              Create User
+            </button>
 
           <button className="login-button" onClick={handleDeleteUser}>
             Delete User
           </button>
-
-            <button className="login-button" onClick={handleDelete}>
-              Delete
-            </button>
-
-            <button className="login-button" onClick={handleAdd}>
-              Add
-            </button>
+          </div>
         </ul>
       </nav>
 
       <div className="main">
         <div className="leftbar">
-
+          <button style={{
+            visibility: validateUser(loggedInUsers) > 1 ? '' : 'hidden'
+          }} className="admin-button" onClick={handleDelete}>
+            Delete
+          </button>
+          <button style={{
+            visibility: validateUser(loggedInUsers) > 1 ? '' : 'hidden'
+          }} className="admin-button" onClick={handleAdd}>
+            Add
+          </button>
         </div>
         <div className="rightbar">
 
           {/* ----------------------------- sort buttons -------------------------- */}
           <select
-            className="input"
+            className="input-filter"
             onChange={handleTableFilterChange}
             value={tableFilter}
           >
@@ -501,46 +501,46 @@ function App() {
           <div className="itembox">
             <h2> Statistics Generator</h2>
             <select className="input" onChange={handleTableNameChange} value={tableName} >
-                <option value="">Select a table</option>
-                {tableNameOptions.map((value) => (
+              <option value="">Select a table</option>
+              {tableNameOptions.map((value) => (
                 <option value={value}>
-                    {value}
+                  {value}
                 </option>
-                ))}
+              ))}
             </select>
 
             <select className="input" onChange={handleItemChange} value={selectItem} >
-                <option value="">Select a value</option>
-                {valueOptions.map((value) => (
+              <option value="">Select a value</option>
+              {valueOptions.map((value) => (
                 <option value={value}>
-                    {value}
+                  {value}
                 </option>
-                ))}
+              ))}
             </select>
 
             <select className="input" onChange={handleStatChange} value={selectStat} >
-                <option value="">Select a value</option>
-                {tableName=="consumable" && (
-                  consumableStatOptions.map((stat) => (
-                    <option value={stat}>
-                        {stat}
-                    </option>
-                    ))
-                )}
-                {tableName=="non_consumable" && (
-                  nonconsumableStatOptions.map((stat) => (
-                    <option value={stat}>
-                        {stat}
-                    </option>
-                    ))
-                )}
-                {tableName=="machine" && (
-                  machineStatOptions.map((stat) => (
-                    <option value={stat}>
-                        {stat}
-                    </option>
-                    ))
-                )}
+              <option value="">Select a value</option>
+              {tableName == "consumable" && (
+                consumableStatOptions.map((stat) => (
+                  <option value={stat}>
+                    {stat}
+                  </option>
+                ))
+              )}
+              {tableName == "non_consumable" && (
+                nonconsumableStatOptions.map((stat) => (
+                  <option value={stat}>
+                    {stat}
+                  </option>
+                ))
+              )}
+              {tableName == "machine" && (
+                machineStatOptions.map((stat) => (
+                  <option value={stat}>
+                    {stat}
+                  </option>
+                ))
+              )}
             </select>
 
             {/* Submit button with disabled attribute based on conditions */}
@@ -553,24 +553,19 @@ function App() {
             ) : (
               <div>
                 <h1>Scatter Plot</h1>
-                <ScatterPlot data={changeData} />
+                <ScatterPlot data={changeData} stat={selectStat} />
               </div>
             )}
-        </div>
-        
-
           </div>
-
-        </div> 
-    
-    </div>
-      
+        </div>
+      </div>
+    </div >
   );
 }
 
-const validateUser = (user) => {
+const validateUser = (users) => {
   try {
-    const type = user.UserType
+    const type = user[0].UserType
     if (type == "ULA")
       return 1
     if (type == "admin")
