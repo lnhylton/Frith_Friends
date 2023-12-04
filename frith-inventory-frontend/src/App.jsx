@@ -7,23 +7,17 @@ import './App.css';
 import LoginForm from './login.jsx'; // Assuming the login file is in the same directory
 import FrithLogo from './components/frith_logo.jsx'
 import CreateUserForm from './components/create_user.jsx';
+import DeleteForm from './components/delete.jsx';
+import AddForm from './components/add.jsx';
 const BACKEND_PORT = 5001
 
 function App() {
-  const [latestResponseAdd, setLatestResponseAdd] = useState("");
   const [latestResponseUpdate, setLatestResponseUpdate] = useState("");
-  const [latestResponseDelete, setLatestResponseDelete] = useState("");
 
   const [tableNameUpdate, setTableNameUpdate] = useState("consumable"); // Default value
-  const [tableNameDelete, setTableNameDelete] = useState("consumable"); // Default value
   const [retrievedDataUpdate, setRetrievedDataUpdate] = useState(null); // Store retrieved data
   const [itemIdUpdate, setItemUpdate] = useState("");
-  const [itemIdDelete, setItemDelete] = useState("");
   const [editedDataUpdate, setEditedDataUpdate] = useState({});
-
-  const [tableNameAdd, setTableNameAdd] = useState("consumable"); // Default value
-  const [retrievedDataAdd, setRetrievedDataAdd] = useState(null); // Store retrieved data
-  const [editedDataAdd, setEditedDataAdd] = useState({});
 
   // Holds the data displayed to the main table
   const [tableData, setTableData] = useState({});
@@ -35,6 +29,9 @@ function App() {
   const [createUserAppear, setCreateUserAppear] = useState(false);
 
   const [editID, setEditID] = useState({ id: 0, disp: false }); // ID to edit
+
+  const [deleteAppear, setDeleteAppear] = useState(false);
+  const [addAppear, setAddAppear] = useState(false);
 
   /* -------------------------------------------------------------------------- */
   /*                                  useEffect                                 */
@@ -62,20 +59,8 @@ function App() {
     setTableNameUpdate(event.target.value);
   };
 
-  const handleTableNameChangeDelete = (event) => {
-    setTableNameDelete(event.target.value);
-  };
-
-  const handleTableNameChangeAdd = (event) => {
-    setTableNameAdd(event.target.value);
-  };
-
   const handleItemIdChange = (event) => {
     setItemUpdate(event.target.value);
-  };
-
-  const handleItemIdDeleteChange = (event) => {
-    setItemDelete(event.target.value);
   };
 
   const handleUpdateDataChange = (event) => {
@@ -84,10 +69,6 @@ function App() {
 
   const handleEditValueUpdate = (key, value) => {
     setEditedDataUpdate({ ...editedDataUpdate, [key]: value });
-  };
-
-  const handleEditValueAdd = (key, value) => {
-    setEditedDataAdd({ ...editedDataAdd, [key]: value });
   };
 
   const handleTableFilterChange = (event) => {
@@ -185,41 +166,12 @@ function App() {
   /*                                     Add                                    */
   /* -------------------------------------------------------------------------- */
 
-  const handleRetrieveAddData = () => {
-    if (tableNameAdd) {
-      fetch(`http://localhost:${BACKEND_PORT}/get_table_attributes?table_name=${tableNameAdd}`)
-        .then((response) => response.json())
-        .then((data) => {
-          setRetrievedDataAdd(data.data);
-          console.log(data.data)
-        })
-        .catch((e) => {
-          latestResponseAdd("failed");
-        });
-    }
+  const handleBackAdd = () => {
+    setAddAppear(false);
   };
 
-  const handleAddDataSubmit = () => {
-    console.log(editedDataAdd)
-    // Perform your API call here to submit the updated data
-    fetch(`http://localhost:${BACKEND_PORT}/add`, {
-      method: "PUT",
-      body: JSON.stringify({
-        tableName: tableNameAdd,
-        addData: editedDataAdd
-      }),
-      headers: {
-        "Content-type": "application/json; charset=UTF-8"
-      }
-    })
-      .then((response) => response.json())
-      .then((res) => {
-        setLatestResponseAdd(res.status);
-        console.log(res);
-      })
-      .catch((e) => {
-        setLatestResponseAdd("failed");
-      });
+  const handleAdd = () => {
+    setAddAppear(true);
   };
 
   /* -------------------------------------------------------------------------- */
@@ -274,27 +226,12 @@ function App() {
   /*                                   Delete                                   */
   /* -------------------------------------------------------------------------- */
 
-  const handleDeleteSubmit = () => {
-    console.log(itemIdDelete)
-    // Perform your API call here to submit the updated data
-    fetch(`http://localhost:${BACKEND_PORT}/delete`, {
-      method: "DELETE",
-      body: JSON.stringify({
-        tableName: tableNameAdd,
-        deleteId: itemIdDelete
-      }),
-      headers: {
-        "Content-type": "application/json; charset=UTF-8"
-      }
-    })
-      .then((response) => response.json())
-      .then((res) => {
-        setLatestResponseDelete(res.status);
-        console.log(res);
-      })
-      .catch((e) => {
-        setLatestResponseDelete("failed");
-      });
+  const handleBackDelete = () => {
+    setDeleteAppear(false);
+  };
+
+  const handleDelete = () => {
+    setDeleteAppear(true);
   };
 
   /* -------------------------------------------------------------------------- */
@@ -320,6 +257,24 @@ function App() {
         createUserAppear ?
           <div className="popup">
             <CreateUserForm onCreate={handleBackCreateUser} onBack={handleBackCreateUser} />
+          </div>
+          :
+          <></>
+      }
+
+      {
+        deleteAppear ?
+          <div className="popup">
+            <DeleteForm onBack={handleBackDelete} />
+          </div>
+          :
+          <></>
+      }
+
+      {
+        addAppear ?
+          <div className="popup">
+            <AddForm onBack={handleBackAdd} />
           </div>
           :
           <></>
@@ -357,6 +312,14 @@ function App() {
             <button className="login-button" onClick={handleCreateUser}>
               Create User
             </button>
+
+            <button className="login-button" onClick={handleDelete}>
+              Delete
+            </button>
+
+            <button className="login-button" onClick={handleAdd}>
+              Add
+            </button>
         </ul>
       </nav>
 
@@ -385,57 +348,6 @@ function App() {
               <Route path="/ula" element={<InventoryList className="table" data={tableData} user="ula" setEditID={setEditID} />} />
               <Route path="/admin" element={<InventoryList className="table" data={tableData} user="admin" setEditID={setEditID} />} />
             </Routes>
-          </div>
-
-          {/* -------------------------------- add -------------------------------- */}
-
-          <div className="itembox">
-            <h2>Add an item to the table selected</h2>
-            <select
-              className="input"
-              onChange={handleTableNameChangeAdd}
-              value={tableNameAdd}
-            >
-              <option value="consumable">consumable</option>
-              <option value="consumable_location">consumable_location</option>
-              <option value="machine">machine</option>
-              <option value="machine_location">machine_location</option>
-              <option value="non_consumable">non_consumable</option>
-              <option value="non_consumable_location">non_consumable_location</option>
-              <option value="room">room</option>
-              <option value="storage_medium">storage_medium</option>
-              <option value="storage_medium_location">storage_medium_location</option>
-            </select>
-
-            <button type="submit" onClick={handleRetrieveAddData}>
-              Retrieve Data
-            </button>
-
-            {retrievedDataAdd && (
-              <div className="retrieved-data">
-                <h3>Data to Add</h3>
-                {Object.entries(retrievedDataAdd).map(([key, value]) => (
-                  <div key={key} className="data-box">
-                    <label className="data-label">
-                      {value}:
-                    </label>
-                    <input
-                      type="text"
-                      className="input data-value"
-                      onChange={(e) => handleEditValueAdd(value, e.target.value)}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <button type="submit" onClick={handleAddDataSubmit}>
-              Submit Add Data
-            </button>
-
-            <label className="query-status">
-              {latestResponseAdd}
-            </label>
           </div>
 
           {/* -------------------------------- update ----------------------------- */}
@@ -478,42 +390,6 @@ function App() {
             :
             <></>
           }
-
-          {/* -------------------------------- delete ----------------------------- */}
-
-          <div className="itembox">
-            <h2>This will delete an item to the selected table:</h2>
-            <select
-              className="input"
-              onChange={handleTableNameChangeDelete}
-              value={tableNameDelete}
-            >
-              <option value="consumable">consumable</option>
-              <option value="consumable_location">consumable_location</option>
-              <option value="machine">machine</option>
-              <option value="machine_location">machine_location</option>
-              <option value="non_consumable">non_consumable</option>
-              <option value="non_consumable_location">non_consumable_location</option>
-              <option value="room">room</option>
-              <option value="storage_medium">storage_medium</option>
-              <option value="storage_medium_location">storage_medium_location</option>
-            </select>
-            <input
-              className="input"
-              type="text"
-              placeholder="Item ID"
-              onChange={handleItemIdDeleteChange}
-              value={itemIdDelete}
-            />
-
-            <button type="submit" onClick={handleDeleteSubmit}>
-              Submit Delete
-            </button>
-
-            <label className="query-status">
-              {latestResponseDelete}
-            </label>
-          </div>
         </div>
       </div>
     </div>
