@@ -17,33 +17,32 @@ const ScatterPlot = ({ data , stat}) => {
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
       var yDomainOrder = [];
+      let yScale;
+      var scaleVal = 0;
+
       if (stat === "stock") {
         yDomainOrder = ['out', 'low', 'in stock'];
+        yScale = d3.scalePoint()
+        .domain(yDomainOrder)
+        .range([height, 0]);
       } else if (stat === "hidden" || stat === "functional") {
         yDomainOrder = [0, 1];
-      } else if (stat === "inventory") {
-        yDomainOrder  = ['out', 'low', 'in stock'];
+        yScale = d3.scalePoint()
+        .domain(yDomainOrder)
+        .range([height, 0]);
+      } else if (stat === "inventory_count") {
+        yDomainOrder  = data.map(d => d.y);
+        yDomainOrder.sort((a, b) => a - b);
+        yScale = d3.scalePoint()
+        .domain(yDomainOrder)
+        .range([height, 0]);
       }
-
-  
 
     // Create scales
     const xScale = d3.scaleTime()
       .domain(d3.extent(data, d => new Date(d.x)))
       .range([0, width]);
 
-      let yScale;
-
-      if (yDomainOrder.length > 0) {
-        yScale = d3.scaleBand()
-          .domain(yDomainOrder)
-          .range([height, 0])
-          .padding(0.1);
-      } else {
-        yScale = d3.scaleLinear()
-          .domain(d3.extent(data, d => d.y))
-          .range([height, 0]);
-      }
       
       svg.selectAll('circle').remove();
       svg.selectAll('.x-axis').remove();
@@ -54,7 +53,7 @@ const ScatterPlot = ({ data , stat}) => {
       .data(data)
       .enter().append('circle')
       .attr('cx', d => xScale(new Date(d.x)))
-      .attr('cy', d => yScale(d.y) - 50)
+      .attr('cy', d => yScale(d.y))
       .attr('r', 5)
       .style('fill', 'steelblue');
 

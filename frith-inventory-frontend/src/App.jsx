@@ -11,7 +11,6 @@ import DeleteUserForm from './components/delete_user.jsx';
 import DeleteForm from './components/delete.jsx';
 import AddForm from './components/add.jsx';
 
-import StatForm from './stats.jsx'; // Assuming the login file is in the same directory
 import ScatterPlot from './components/scatterplot.jsx';
 
 
@@ -308,6 +307,7 @@ function App() {
       .catch((e) => {
         setLatestResponseUpdate("failed");
       });
+      setSelectedStat("");
   };
 
   /* -------------------------------------------------------------------------- */
