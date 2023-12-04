@@ -50,7 +50,7 @@ function App() {
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loggedIn]);
+  }, [loggedIn, tableFilter]);
 
   /* -------------------------------------------------------------------------- */
   /*                                  Handlers                                  */
@@ -86,6 +86,10 @@ function App() {
 
   const handleEditValueAdd = (key, value) => {
     setEditedDataAdd({ ...editedDataAdd, [key]: value });
+  };
+
+  const handleTableFilterChange = (event) => {
+    setTableFilter(event.target.value);
   };
 
   /* -------------------------------------------------------------------------- */
@@ -329,11 +333,15 @@ function App() {
         <div className="rightbar">
 
           {/* ----------------------------- sort buttons -------------------------- */}
-          <div className="sortButtons">
-            {/* <button onClick={setTableFilter("consumable")}>Consumable</button>
-            <button onClick={setTableFilter("non-consumable")}>Non_Consumable</button>
-            <button onClick={setTableFilter("machine")}>Machines</button> */}
-          </div>
+          <select
+            className="input"
+            onChange={handleTableFilterChange}
+            value={tableFilter}
+          >
+            <option value="consumable">consumable</option>
+            <option value="non_consumable">non_consumable</option>
+            <option value="machine">machine</option>
+          </select>
 
           {/* ---------------------------- navigation ----------------------------- */}
 

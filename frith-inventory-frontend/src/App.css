@@ -61,10 +61,6 @@ body{
   font-size: 25px;
 }
 
-.sortButtons > button:active {
-  color: blue;
-}
-
 .navbar {
   width: 100%;
   list-style-type: none;

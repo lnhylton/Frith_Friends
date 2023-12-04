@@ -13,12 +13,12 @@ const InventoryList = (props) => {
         data,
         className,
         user,
-        onClick
+        onClick=null
     } = props;
 
     const renderEditButton = (params) => {
         return (
-            <button className="button">
+            <button className="button" onClick={onClick}>
                 Edit
             </button>
         )
