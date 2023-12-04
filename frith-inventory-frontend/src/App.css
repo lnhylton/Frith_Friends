@@ -61,6 +61,16 @@ body{
   font-size: 25px;
 }
 
+.guest {
+  margin-top: 5%;
+  margin-bottom: 5%;
+  width: 90%;
+}
+
+.table {
+  background-color: white;
+}
+
 .navbar {
   width: 100%;
   list-style-type: none;

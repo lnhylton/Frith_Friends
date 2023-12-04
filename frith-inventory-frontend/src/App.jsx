@@ -2,9 +2,7 @@ import { useState, useEffect } from 'react';
 import React from "react";
 import { NavLink, Routes, Route } from "react-router-dom"
 
-import Guest from "./pages/Guest"
-import ULA from "./pages/ULA"
-import Admin from "./pages/Admin"
+import InventoryList from './components/data_list.jsx';
 import './App.css';
 import LoginForm from './login'; // Assuming the login file is in the same directory
 import FrithLogo from './components/frith_logo.jsx'
@@ -28,11 +26,13 @@ function App() {
 
   // Holds the data displayed to the main table
   const [tableData, setTableData] = useState({});
-
   const [tableFilter, setTableFilter] = useState("consumable");
 
   const [loggedIn, setLoggedIn] = useState(false); // Login state
   const [loggedInUsers, setLoggedInUsers] = useState({});
+
+  const [targetID, setTargetID] = useState(0); // Default ID
+  const [editActive, setEditActive] = useState(false);
 
   /* -------------------------------------------------------------------------- */
   /*                                  useEffect                                 */
@@ -315,12 +315,12 @@ function App() {
           })} to="/admin">
             Admin
           </NavLink>
-          {!loggedIn && loggedInUsers.length<1 ?
-            <button className="login-button" onClick={handleLogin}>
+          {!loggedIn && loggedInUsers.length < 1 ?
+            <button className="login-button" onClick={() => handleLogin}>
               Login
             </button>
             :
-            <button className="login-button" onClick={handleLogout}>
+            <button className="login-button" onClick={() => handleLogout}>
               Logout
             </button>}
         </ul>
@@ -345,11 +345,13 @@ function App() {
 
           {/* ---------------------------- navigation ----------------------------- */}
 
-          <Routes>
-            <Route path="/" element={<Guest data={tableData} />} />
-            <Route path="/ula" element={<ULA data={tableData} />} />
-            <Route path="/admin" element={<Admin data={tableData} />} />
-          </Routes>
+          <div className="guest">
+            <Routes>
+              <Route path="/" element={<InventoryList className="table" data={tableData} />} />
+              <Route path="/ula" element={<InventoryList className="table" data={tableData} user="ula" />} />
+              <Route path="/admin" element={<InventoryList className="table" data={tableData} user="admin" />} />
+            </Routes>
+          </div>
 
           {/* -------------------------------- add -------------------------------- */}
 
@@ -371,7 +373,7 @@ function App() {
               <option value="storage_medium_location">storage_medium_location</option>
             </select>
 
-            <button type="submit" onClick={handleRetrieveAddData}>
+            <button type="submit" onClick={() => handleRetrieveAddData}>
               Retrieve Data
             </button>
 
@@ -393,7 +395,7 @@ function App() {
               </div>
             )}
 
-            <button type="submit" onClick={handleAddDataSubmit}>
+            <button type="submit" onClick={() => handleAddDataSubmit}>
               Submit Add Data
             </button>
 
@@ -429,7 +431,7 @@ function App() {
               value={itemIdUpdate}
             />
 
-            <button type="submit" onClick={handleRetrieveUpdateData}>
+            <button type="submit" onClick={() => handleRetrieveUpdateData}>
               Retrieve Data
             </button>
 
@@ -451,7 +453,7 @@ function App() {
                 ))}
               </div>
             )}
-            <button type="submit" onClick={handleUpdateDataSubmit}>
+            <button type="submit" onClick={() => handleUpdateDataSubmit}>
               Submit Updated Data
             </button>
 
@@ -487,7 +489,7 @@ function App() {
               value={itemIdDelete}
             />
 
-            <button type="submit" onClick={handleDeleteSubmit}>
+            <button type="submit" onClick={() => handleDeleteSubmit}>
               Submit Delete
             </button>
 
