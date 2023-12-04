@@ -103,9 +103,17 @@ function App() {
   /* -------------------------------------------------------------------------- */
 
   const getTableData = () => {
-    const tableNameFilter = "consumable"
+    const tableNameFilter = ["consumable", "non_consumable"]
     if (tableNameFilter) {
-      fetch(`http://localhost:${BACKEND_PORT}/get_table?table_name=${tableNameFilter}`)
+      fetch(`http://localhost:${BACKEND_PORT}/get_table_data`, {
+        method: "PUT",
+        body: JSON.stringify({
+          tableName: tableNameFilter
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8"
+        }
+      })
         .then((response) => response.json())
         .then((data) => {
           setTableData(data.data)

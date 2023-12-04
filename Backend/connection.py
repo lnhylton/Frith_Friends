@@ -12,7 +12,7 @@ CORS(app)
 
 config = {
     'host': 'localhost',
-    'user': 'Admin',
+    'user': 'admin',
     'password': 'frith',
     'database': 'frith_friends'
 }
@@ -270,6 +270,66 @@ def create_user():
     cursor.close()
     conn.close()
     return jsonify(response)
+
+@app.route('/get_table_data', methods=["PUT"])
+def get_table_data():
+    table_name = request.json['tableName']
+    
+    if table_name is None:
+        return jsonify({"status": "error", "message": "Table name is required."})
+
+    conn = mysql.connector.connect(**config)
+    cursor = conn.cursor()
+    
+    try:
+        # Use a parameterized query to retrieve data from the specified table and row
+        data = []
+        for table in table_name:
+            print(table)
+            cursor.execute(f"""WITH RECURSIVE Storage_Medium_Path AS (
+            SELECT
+                child_sm_id,
+                parent_sm_id,
+                CAST(parent_sm_id AS CHAR(200)) AS parent_ids
+            FROM Storage_Medium_Location
+
+            UNION ALL
+
+            SELECT
+                sml.child_sm_id,
+                sml.parent_sm_id,
+                CONCAT(smp.parent_ids, ',', sml.parent_sm_id)
+            FROM Storage_Medium_Path smp
+            JOIN Storage_Medium_Location sml ON smp.child_sm_id = sml.parent_sm_id
+            )
+
+            SELECT *
+            FROM (
+            SELECT
+                c.*,
+                smp.parent_ids,
+                ROW_NUMBER() OVER (PARTITION BY c.{get_item_ids(table)} ORDER BY LENGTH(smp.parent_ids) DESC) AS rn
+            FROM {table} c
+            LEFT JOIN {table}_Location cl ON c.{get_item_ids(table)} = cl.{get_item_ids(table)}
+            LEFT JOIN Storage_Medium_Path smp ON cl.sm_id = smp.child_sm_id
+            ) AS ranked
+            WHERE rn = 1""")
+
+            rows = cursor.fetchall()
+            # Get column names from the cursor description
+            column_names = [desc[0] for desc in cursor.description]
+
+            # Convert rows to a list of dictionaries
+            data += [dict(zip(column_names, row)) for row in rows]
+        print(data)
+
+        conn.close()
+
+        return jsonify({"status": "success", "data": data})
+    except Exception as e:
+        conn.close()
+        print(str(e))
+        return jsonify({"status": "error", "message": str(e)})
 
 if __name__ == '__main__':
     app.run(debug=True, port=BACKEND_PORT)
