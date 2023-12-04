@@ -103,12 +103,21 @@ function App() {
   /* -------------------------------------------------------------------------- */
 
   const getTableData = () => {
-    const tableNameFilter = "consumable"
+    const tableNameFilter = ["non_consumable"]
     if (tableNameFilter) {
-      fetch(`http://localhost:${BACKEND_PORT}/get_table?table_name=${tableNameFilter}`)
+      fetch(`http://localhost:${BACKEND_PORT}/get_table_data`, {
+        method: "PUT",
+        body: JSON.stringify({
+          tableName: tableNameFilter
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8"
+        }
+      })
         .then((response) => response.json())
         .then((data) => {
           setTableData(data.data)
+          console.log(data.data)
         })
         .catch((e) => {
           console.log("failed")
@@ -237,49 +246,49 @@ function App() {
       </div>
 
       {
-            loggedIn ?
-              <div className="popup">
-                <LoginForm onLogin={handleLogout} onBack={handleBackToMainContent} />
-              </div>
-              :
-              <></>
-          }
+        loggedIn ?
+          <div className="popup">
+            <LoginForm onLogin={handleLogout} onBack={handleBackToMainContent} />
+          </div>
+          :
+          <></>
+      }
 
       <nav className="navbar">
-            <ul>
-              <NavLink style={({ isActive }) => ({
-                color: isActive ? '#fff' : '',
-                background: isActive ? '#888' : ''
-              })} to="/">
-                Guest
-              </NavLink>
-              <NavLink style={({ isActive }) => ({
-                color: isActive ? '#fff' : '',
-                background: isActive ? '#888' : ''
-              })} to="/ula">
-                ULA
-              </NavLink>
-              <NavLink style={({ isActive }) => ({
-                color: isActive ? '#fff' : '',
-                background: isActive ? '#888' : ''
-              })} to="/admin">
-                Admin
-              </NavLink>
-              {!loggedIn ? (
-                <button className="login-button" onClick={handleLogin}>
-                  Login
-                </button>
-              ) : null}
-            </ul>
-          </nav>
+        <ul>
+          <NavLink style={({ isActive }) => ({
+            color: isActive ? '#fff' : '',
+            background: isActive ? '#888' : ''
+          })} to="/">
+            Guest
+          </NavLink>
+          <NavLink style={({ isActive }) => ({
+            color: isActive ? '#fff' : '',
+            background: isActive ? '#888' : ''
+          })} to="/ula">
+            ULA
+          </NavLink>
+          <NavLink style={({ isActive }) => ({
+            color: isActive ? '#fff' : '',
+            background: isActive ? '#888' : ''
+          })} to="/admin">
+            Admin
+          </NavLink>
+          {!loggedIn ? (
+            <button className="login-button" onClick={handleLogin}>
+              Login
+            </button>
+          ) : null}
+        </ul>
+      </nav>
 
       <div className="main">
         <div className="leftbar">
-          
+
         </div>
         <div className="rightbar">
           {/* ---------------------------- navigation ----------------------------- */}
-          
+
           <Routes>
             <Route path="/" element={<Guest data={tableData} />} />
             <Route path="/ula" element={<ULA data={tableData} />} />
