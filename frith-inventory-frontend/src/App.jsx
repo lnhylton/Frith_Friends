@@ -289,7 +289,7 @@ function App() {
       {
         loggedIn ?
           <div className="popup">
-            <LoginForm onBack={handleBackToMainContent} />
+            <LoginForm onBack={() => handleBackToMainContent} />
           </div>
           :
           <></>
@@ -316,11 +316,11 @@ function App() {
             Admin
           </NavLink>
           {!loggedIn && loggedInUsers.length < 1 ?
-            <button className="login-button" onClick={() => handleLogin}>
+            <button className="login-button" onClick={handleLogin}>
               Login
             </button>
             :
-            <button className="login-button" onClick={() => handleLogout}>
+            <button className="login-button" onClick={handleLogout}>
               Logout
             </button>}
         </ul>
@@ -373,7 +373,7 @@ function App() {
               <option value="storage_medium_location">storage_medium_location</option>
             </select>
 
-            <button type="submit" onClick={() => handleRetrieveAddData}>
+            <button type="submit" onClick={handleRetrieveAddData}>
               Retrieve Data
             </button>
 
@@ -395,7 +395,7 @@ function App() {
               </div>
             )}
 
-            <button type="submit" onClick={() => handleAddDataSubmit}>
+            <button type="submit" onClick={handleAddDataSubmit}>
               Submit Add Data
             </button>
 
@@ -431,7 +431,7 @@ function App() {
               value={itemIdUpdate}
             />
 
-            <button type="submit" onClick={() => handleRetrieveUpdateData}>
+            <button type="submit" onClick={handleRetrieveUpdateData}>
               Retrieve Data
             </button>
 
@@ -453,7 +453,7 @@ function App() {
                 ))}
               </div>
             )}
-            <button type="submit" onClick={() => handleUpdateDataSubmit}>
+            <button type="submit" onClick={handleUpdateDataSubmit}>
               Submit Updated Data
             </button>
 
@@ -489,7 +489,7 @@ function App() {
               value={itemIdDelete}
             />
 
-            <button type="submit" onClick={() => handleDeleteSubmit}>
+            <button type="submit" onClick={handleDeleteSubmit}>
               Submit Delete
             </button>
 
