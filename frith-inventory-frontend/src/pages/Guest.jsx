@@ -11,7 +11,7 @@ const Guest = () => {
         <>
             <div>
                 Guest
-                <GuestList data={data} />
+                {/* <GuestList data={data} /> */}
             </div>
         </>
     )
