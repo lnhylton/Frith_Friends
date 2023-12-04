@@ -315,7 +315,7 @@ function App() {
           })} to="/admin">
             Admin
           </NavLink>
-          {!loggedIn && !loggedInUsers ?
+          {!loggedIn && loggedInUsers.length<1 ?
             <button className="login-button" onClick={handleLogin}>
               Login
             </button>
