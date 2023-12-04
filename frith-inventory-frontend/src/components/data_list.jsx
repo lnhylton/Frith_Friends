@@ -30,7 +30,7 @@ const InventoryList = (props) => {
     // Define columns based on the keys of the first object in the dictionary
     const cols = Object.keys(rows[0] || {}).map((key) => {
         // Exclude the 'id' column
-        if (key !== 'id') {
+        if (key.indexOf('id')<0 || user=="admin") {
             return {
                 field: key,
                 headerName: key,
@@ -48,8 +48,18 @@ const InventoryList = (props) => {
         return null;
     }).filter(Boolean);
 
+    // Put "Name" column first
+    var rearrangedCols = [
+        {
+          field: 'name',
+          headerName: 'Name',
+          flex: 1,
+        },
+        ...cols.filter((col) => col.field !== 'name'),
+      ];
+
     if (user && (user == "admin" || user == "ula")) {
-        cols.push({
+        rearrangedCols.push({
             field: "edit",
             headerName: "edit",
             flex: 1,
@@ -62,7 +72,7 @@ const InventoryList = (props) => {
         <>
             <Box className={className}>
                 <DataGrid
-                    columns={cols}
+                    columns={rearrangedCols}
                     rows={rows}
                     initialState={{
                         ...data.initialState,

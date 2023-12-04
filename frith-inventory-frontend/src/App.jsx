@@ -29,7 +29,10 @@ function App() {
   // Holds the data displayed to the main table
   const [tableData, setTableData] = useState({});
 
+  const [tableFilter, setTableFilter] = useState("consumable");
+
   const [loggedIn, setLoggedIn] = useState(false); // Login state
+  const [loggedInUsers, setLoggedInUsers] = useState({});
 
   /* -------------------------------------------------------------------------- */
   /*                                  useEffect                                 */
@@ -38,13 +41,16 @@ function App() {
   useEffect(() => {
     // Runs on mount
     getTableData()
+    getLoggedInUsers()
+
+    console.log(loggedInUsers)
 
     // Runs on dismount
     return () => {
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loggedIn]);
 
   /* -------------------------------------------------------------------------- */
   /*                                  Handlers                                  */
@@ -95,15 +101,46 @@ function App() {
   };
 
   const handleLogout = () => {
-    setLoggedIn(false);
+    fetch(`http://localhost:${BACKEND_PORT}/logout`, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      }
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setLoggedInUsers({})
+        setLoggedIn(false);
+        console.log(data)
+      })
+      .catch((e) => {
+        console.log("failed")
+      });
+  };
+
+  const getLoggedInUsers = () => {
+    fetch(`http://localhost:${BACKEND_PORT}/get_logged_in_users`, {
+      method: "GET",
+      headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      }
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setLoggedInUsers(data.data)
+        console.log(data.data)
+      })
+      .catch((e) => {
+        console.log("failed")
+      });
   };
 
   /* -------------------------------------------------------------------------- */
-  /*                                 Guest Data                                 */
+  /*                                 Data List                                  */
   /* -------------------------------------------------------------------------- */
 
   const getTableData = () => {
-    const tableNameFilter = ["non_consumable"]
+    const tableNameFilter = [tableFilter]
     if (tableNameFilter) {
       fetch(`http://localhost:${BACKEND_PORT}/get_table_data`, {
         method: "PUT",
@@ -175,7 +212,7 @@ function App() {
       fetch(`http://localhost:${BACKEND_PORT}/get_data?table_name=${tableNameUpdate}&row_id=${itemIdUpdate}`)
         .then((response) => response.json())
         .then((data) => {
-          setRetrievedData(data.data);
+          setRetrievedDataUpdate(data.data);
           setEditedDataUpdate(data.data);
           console.log(data.data);
         })
@@ -248,7 +285,7 @@ function App() {
       {
         loggedIn ?
           <div className="popup">
-            <LoginForm onLogin={handleLogout} onBack={handleBackToMainContent} />
+            <LoginForm onBack={handleBackToMainContent} />
           </div>
           :
           <></>
@@ -274,11 +311,14 @@ function App() {
           })} to="/admin">
             Admin
           </NavLink>
-          {!loggedIn ? (
+          {!loggedIn && !loggedInUsers ?
             <button className="login-button" onClick={handleLogin}>
               Login
             </button>
-          ) : null}
+            :
+            <button className="login-button" onClick={handleLogout}>
+              Logout
+            </button>}
         </ul>
       </nav>
 
@@ -287,6 +327,14 @@ function App() {
 
         </div>
         <div className="rightbar">
+
+          {/* ----------------------------- sort buttons -------------------------- */}
+          <div className="sortButtons">
+            {/* <button onClick={setTableFilter("consumable")}>Consumable</button>
+            <button onClick={setTableFilter("non-consumable")}>Non_Consumable</button>
+            <button onClick={setTableFilter("machine")}>Machines</button> */}
+          </div>
+
           {/* ---------------------------- navigation ----------------------------- */}
 
           <Routes>

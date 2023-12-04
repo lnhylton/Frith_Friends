@@ -225,9 +225,29 @@ def login():
         userPasswordHash = cursor.fetchone()[0];
         if (password_backend.verify_password(userPasswordHash, enteredPassword)):
             response = {"status": "success"}
+            cursor.execute(f"UPDATE user_authentication SET UserIsLoggedIn=1 WHERE Username='{enteredUsername}'")
+
         else:
             response = {"status": "error", "message": "Incorrect password"}
 
+    except Exception as e:
+        response = {"status": "error", "message": str(e)}
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return jsonify(response)
+
+@app.route('/logout', methods=["POST"])
+def logout():
+    data = get_logged_in_users()
+
+    conn = mysql.connector.connect(**config)
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute(f"UPDATE user_authentication SET UserIsLoggedIn=0 WHERE Username='{data['Username']}'")
+        response = {"status": "success"}
     except Exception as e:
         response = {"status": "error", "message": str(e)}
 
@@ -270,6 +290,7 @@ def create_user():
     cursor.close()
     conn.close()
     return jsonify(response)
+
 
 @app.route('/get_table_data', methods=["PUT"])
 def get_table_data():

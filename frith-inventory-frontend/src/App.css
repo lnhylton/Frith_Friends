@@ -39,7 +39,7 @@ body{
 
 .leftbar {
   width: 8%;
-  background: linear-gradient(to right, black, transparent);
+  background: linear-gradient(to right, black, transparent 100%);
   padding: 1%;
 }
 
@@ -48,6 +48,21 @@ body{
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.sortButtons {
+  margin-top: 5%;
+  width: 50%;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.sortButtons > button {
+  font-size: 25px;
+}
+
+.sortButtons > button:active {
+  color: blue;
 }
 
 .navbar {
@@ -80,7 +95,7 @@ body{
 .popup {
   position: absolute;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   z-index: 10;
 }
 
