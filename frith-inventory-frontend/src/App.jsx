@@ -7,6 +7,7 @@ import './App.css';
 import LoginForm from './login.jsx'; // Assuming the login file is in the same directory
 import FrithLogo from './components/frith_logo.jsx'
 import CreateUserForm from './components/create_user.jsx';
+import DeleteUserForm from './components/delete_user.jsx';
 import DeleteForm from './components/delete.jsx';
 import AddForm from './components/add.jsx';
 
@@ -30,6 +31,8 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false); // Login state
   const [loggedInUsers, setLoggedInUsers] = useState({});
   const [createUserAppear, setCreateUserAppear] = useState(false);
+  const [deleteUserAppear, setDeleteUserAppear] = useState(false);
+
 
   const [itemToEdit, setItemToEdit] = useState({ id: 0, disp: false });
 
@@ -212,6 +215,14 @@ function App() {
     setCreateUserAppear(false);
   }
 
+  const handleDeleteUser = () => {
+    setDeleteUserAppear(true);
+  };
+
+  const handleBackDeleteUser = () => {
+    setDeleteUserAppear(false);
+  }
+
   /* -------------------------------------------------------------------------- */
   /*                                 Data List                                  */
   /* -------------------------------------------------------------------------- */
@@ -357,6 +368,15 @@ function App() {
           <></>
       }
 
+      {
+        deleteUserAppear ?
+          <div className="popup">
+            <DeleteUserForm onBack={handleBackDeleteUser} />
+          </div>
+          :
+          <></>
+      }
+
       <nav className="navbar">
         <ul>
           <NavLink style={({ isActive }) => ({
@@ -368,45 +388,50 @@ function App() {
           <NavLink style={({ isActive }) => ({
             color: isActive ? '#fff' : '',
             background: isActive ? '#888' : '',
-            pointerEvents: validateUser(loggedInUsers[0]) > 0 ? '' : 'none'
+            pointerEvents: validateUser(loggedInUsers) > 0 ? '' : 'none'
           })} to="/ula">
             ULA
           </NavLink>
           <NavLink style={({ isActive }) => ({
             color: isActive ? '#fff' : '',
             background: isActive ? '#888' : '',
-            pointerEvents: validateUser(loggedInUsers[0]) > 1 ? '' : 'none'
+            pointerEvents: validateUser(loggedInUsers) > 1 ? '' : 'none'
           })} to="/admin">
             Admin
           </NavLink>
 
-          <div className="login-zone">
-            {!loggedIn ?
-              <button className="login-button" onClick={handleLogin}>
-                Login
-              </button>
-              :
-              <NavLink className="login-button" to="/" onClick={handleLogout}>
-                Logout
-              </NavLink>
-            }
-
+          <div style={{
+            visibility: validateUser(loggedInUsers) > 1 ? '' : 'hidden'
+          }} className="admin-login-zone">
             <button className="login-button" onClick={handleCreateUser}>
               Create User
             </button>
+
+            <button className="login-button" onClick={handleDeleteUser}>
+              Delete User
+            </button>
           </div>
+          {!loggedIn ?
+            <button className="login-button" onClick={handleLogin}>
+              Login
+            </button>
+            :
+            <NavLink className="login-button" to="/" onClick={handleLogout}>
+              Logout
+            </NavLink>
+          }
         </ul>
       </nav>
 
       <div className="main">
         <div className="leftbar">
           <button style={{
-            visibility: validateUser(loggedInUsers[0]) > 1 ? '' : 'hidden'
+            visibility: validateUser(loggedInUsers) > 1 ? '' : 'hidden'
           }} className="admin-button" onClick={handleDelete}>
             Delete
           </button>
           <button style={{
-            visibility: validateUser(loggedInUsers[0]) > 1 ? '' : 'hidden'
+            visibility: validateUser(loggedInUsers) > 1 ? '' : 'hidden'
           }} className="admin-button" onClick={handleAdd}>
             Add
           </button>
@@ -539,9 +564,9 @@ function App() {
   );
 }
 
-const validateUser = (user) => {
+const validateUser = (users) => {
   try {
-    const type = user.UserType
+    const type = users[0].UserType
     if (type == "ULA")
       return 1
     if (type == "admin")

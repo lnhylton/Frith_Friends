@@ -1,8 +1,4 @@
 import React, { useState } from 'react';
-import {
-    createBrowserRouter,
-    RouterProvider,
-} from "react-router-dom";
 
 const BACKEND_PORT = 5001;
 
