@@ -319,6 +319,26 @@ def create_user():
     conn.close()
     return jsonify(response)
 
+@app.route('/delete_user', methods=['DELETE'])
+def delete_user():
+    try:
+        username = request.json['username']
+
+        conn = mysql.connector.connect(**config)
+        cursor = conn.cursor()
+
+        # Using parameterized query to update a specific item by its ID
+        cursor.execute(f"DELETE FROM User_Authentication WHERE Username='{username}'")
+        conn.commit()
+        cursor.close()
+        conn.close()
+        response = {"status": "success"}
+        #except Exception as e:
+        #    response = {"status": "error", "message": str(e)}
+        return jsonify(response)
+    except Exception as e:
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)})
 
 @app.route('/get_table_data', methods=["PUT"])
 def get_table_data():
