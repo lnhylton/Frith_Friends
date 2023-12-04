@@ -541,7 +541,7 @@ function App() {
 
 const validateUser = (users) => {
   try {
-    const type = user[0].UserType
+    const type = users[0].UserType
     if (type == "ULA")
       return 1
     if (type == "admin")
