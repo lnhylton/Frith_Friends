@@ -56,6 +56,10 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loggedIn, tableFilter, itemToEdit, deleteAppear, addAppear]);
 
+  useEffect(()=> {
+    handleRetrieveUpdateData()
+  }, [itemToEdit])
+
   /* -------------------------------------------------------------------------- */
   /*                                  Handlers                                  */
   /* -------------------------------------------------------------------------- */
@@ -534,7 +538,9 @@ function App() {
             :
             <></>
           }
-          <div className="itembox">
+          <div className="itembox" style={{
+            visibility: validateUser(loggedInUsers) > 1 ? '' : 'hidden'
+          }}>
             <h2> Statistics Generator</h2>
             <select className="input" onChange={handleTableNameChange} value={tableName} >
               <option value="">Select a table</option>

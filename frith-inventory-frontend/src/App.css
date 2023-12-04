@@ -50,19 +50,12 @@ body{
   align-items: center;
 }
 
-.sortButtons {
-  margin-top: 5%;
-  width: 50%;
-  display: flex;
-  justify-content: space-evenly;
-}
-
 .sortButtons > button {
   font-size: 25px;
 }
 
 .guest {
-  margin-top: 5%;
+  margin-top: 2%;
   margin-bottom: 5%;
   width: 90%;
 }
@@ -149,8 +142,8 @@ body{
 }
 
 .input-filter {
-  margin-top: 3%;
-  height: 50px;
+  margin-top: 2%;
+  height: 100px;
   width: 400px;
   font-size: 20px;
 }
