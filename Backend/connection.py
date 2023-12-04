@@ -246,7 +246,7 @@ def logout():
     cursor = conn.cursor()
     
     try:
-        cursor.execute(f"UPDATE user_authentication SET UserIsLoggedIn=0 WHERE Username='{data[0]}'")
+        cursor.execute(f"UPDATE user_authentication SET UserIsLoggedIn=0 WHERE Username='{data['Username']}'")
         response = {"status": "success"}
     except Exception as e:
         response = {"status": "error", "message": str(e)}
@@ -297,10 +297,9 @@ def get_table_data():
     
     if table_name is None:
         return jsonify({"status": "error", "message": "Table name is required."})
-
     conn = mysql.connector.connect(**config)
     cursor = conn.cursor()
-    
+
     try:
         # Use a parameterized query to retrieve data from the specified table and row
         data = []
