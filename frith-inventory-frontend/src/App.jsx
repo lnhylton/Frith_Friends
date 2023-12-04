@@ -2,9 +2,7 @@ import { useState, useEffect } from 'react';
 import React from "react";
 import { NavLink, Routes, Route } from "react-router-dom"
 
-import Guest from "./pages/Guest"
-import ULA from "./pages/ULA"
-import Admin from "./pages/Admin"
+import InventoryList from './components/data_list.jsx';
 import './App.css';
 import LoginForm from './login.jsx'; // Assuming the login file is in the same directory
 import FrithLogo from './components/frith_logo.jsx'
@@ -33,6 +31,9 @@ function App() {
   const [waitLogin, setWaitLogin] = useState(false); // Login state
   const [loggedIn, setLoggedIn] = useState(false); // Login state
   const [loggedInUsers, setLoggedInUsers] = useState({});
+
+  const [targetID, setTargetID] = useState(0); // Default ID
+  const [editActive, setEditActive] = useState(false);
 
   /* -------------------------------------------------------------------------- */
   /*                                  useEffect                                 */
@@ -346,11 +347,13 @@ function App() {
 
           {/* ---------------------------- navigation ----------------------------- */}
 
-          <Routes>
-            <Route path="/" element={<Guest data={tableData} />} />
-            <Route path="/ula" element={<ULA data={tableData} />} />
-            <Route path="/admin" element={<Admin data={tableData} />} />
-          </Routes>
+          <div className="guest">
+            <Routes>
+              <Route path="/" element={<InventoryList className="table" data={tableData} />} />
+              <Route path="/ula" element={<InventoryList className="table" data={tableData} user="ula" />} />
+              <Route path="/admin" element={<InventoryList className="table" data={tableData} user="admin" />} />
+            </Routes>
+          </div>
 
           {/* -------------------------------- add -------------------------------- */}
 

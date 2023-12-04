@@ -13,24 +13,27 @@ const InventoryList = (props) => {
         data,
         className,
         user,
-        onClick=null
     } = props;
+
+    const handler = (params) => {
+        console.log(params)
+    }
 
     const renderEditButton = (params) => {
         return (
-            <button className="button" onClick={onClick}>
+            <button className="button" onClick={() => handler(params)}>
                 Edit
             </button>
         )
     }
 
     // Convert dictionary to an array of objects
-    const rows = Object.entries(data.data).map(([id, rowData]) => ({ id, ...rowData }));
+    const rows = Object.entries(data).map(([id, rowData]) => ({ id, ...rowData }));
 
     // Define columns based on the keys of the first object in the dictionary
     const cols = Object.keys(rows[0] || {}).map((key) => {
         // Exclude the 'id' column
-        if (key.indexOf('id')<0 || user=="admin") {
+        if (key.indexOf('id') < 0 || user == "admin") {
             return {
                 field: key,
                 headerName: key,
@@ -51,12 +54,12 @@ const InventoryList = (props) => {
     // Put "Name" column first
     var rearrangedCols = [
         {
-          field: 'name',
-          headerName: 'Name',
-          flex: 1,
+            field: 'name',
+            headerName: 'Name',
+            flex: 1,
         },
         ...cols.filter((col) => col.field !== 'name'),
-      ];
+    ];
 
     if (user && (user == "admin" || user == "ula")) {
         rearrangedCols.push({
@@ -69,19 +72,17 @@ const InventoryList = (props) => {
     }
 
     return (
-        <>
-            <Box className={className}>
-                <DataGrid
-                    columns={rearrangedCols}
-                    rows={rows}
-                    initialState={{
-                        ...data.initialState,
-                        pagination: { paginationModel: { pageSize: 100 } },
-                    }}
-                    pageSizeOptions={[10, 25, 100]}
-                />
-            </Box>
-        </>
+        <Box className={className}>
+            <DataGrid
+                columns={rearrangedCols}
+                rows={rows}
+                initialState={{
+                    ...data.initialState,
+                    pagination: { paginationModel: { pageSize: 100 } },
+                }}
+                pageSizeOptions={[10, 25, 100]}
+            />
+        </Box>
     )
 }
 
