@@ -5,7 +5,6 @@ const ScatterPlot = ({ data }) => {
   const svgRef = useRef();
 
   useEffect(() => {
-    // Set up the SVG container
     const margin = { top: 20, right: 20, bottom: 40, left: 40 };
     const width = 500 - margin.left - margin.right;
     const height = 400 - margin.top - margin.bottom;
@@ -17,8 +16,9 @@ const ScatterPlot = ({ data }) => {
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
     // Create scales
+    const parseTime = d3.timeParse('%Y-%m-%d %H:%M:%S');
     const xScale = d3.scaleTime()
-      .domain(d3.extent(data, d => new Date(d.x)))
+      .domain(d3.extent(data, d => parseTime(d.x)))
       .range([0, width]);
 
     const yScale = d3.scaleBand()
@@ -30,13 +30,15 @@ const ScatterPlot = ({ data }) => {
     svg.selectAll('circle')
       .data(data)
       .enter().append('circle')
-      .attr('cx', d => xScale(new Date(d.x)))
+      .attr('cx', d => xScale(parseTime(d.x)))
       .attr('cy', d => yScale(d.y) + yScale.bandwidth() / 2)
       .attr('r', 5)
       .style('fill', 'steelblue');
 
     // Create axes
-    const xAxis = d3.axisBottom(xScale);
+    const xAxis = d3.axisBottom(xScale)
+      .tickFormat(d3.timeFormat('%Y-%m-%d %H:%M:%S'));
+
     const yAxis = d3.axisLeft(yScale);
 
     svg.append('g')
