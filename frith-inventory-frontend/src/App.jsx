@@ -7,6 +7,8 @@ import './App.css';
 import LoginForm from './login.jsx'; // Assuming the login file is in the same directory
 import FrithLogo from './components/frith_logo.jsx'
 import CreateUserForm from './components/create_user.jsx';
+import DeleteForm from './components/delete.jsx';
+import AddForm from './components/add.jsx';
 
 import StatForm from './stats.jsx'; // Assuming the login file is in the same directory
 import ScatterPlot from './components/scatterplot.jsx';
@@ -15,18 +17,10 @@ import ScatterPlot from './components/scatterplot.jsx';
 const BACKEND_PORT = 5001
 
 function App() {
-  const [latestResponseAdd, setLatestResponseAdd] = useState("");
   const [latestResponseUpdate, setLatestResponseUpdate] = useState("");
-  const [latestResponseDelete, setLatestResponseDelete] = useState("");
 
-  const [tableNameDelete, setTableNameDelete] = useState("consumable"); // Default value
   const [retrievedDataUpdate, setRetrievedDataUpdate] = useState(null); // Store retrieved data
-  const [itemIdDelete, setItemDelete] = useState("");
   const [editedDataUpdate, setEditedDataUpdate] = useState({});
-
-  const [tableNameAdd, setTableNameAdd] = useState("consumable"); // Default value
-  const [retrievedDataAdd, setRetrievedDataAdd] = useState(null); // Store retrieved data
-  const [editedDataAdd, setEditedDataAdd] = useState({});
 
   // Holds the data displayed to the main table
   const [tableData, setTableData] = useState({});
@@ -38,6 +32,9 @@ function App() {
   const [createUserAppear, setCreateUserAppear] = useState(false);
 
   const [itemToEdit, setItemToEdit] = useState({ id: 0, disp: false });
+
+  const [deleteAppear, setDeleteAppear] = useState(false);
+  const [addAppear, setAddAppear] = useState(false);
 
   /* -------------------------------------------------------------------------- */
   /*                                  useEffect                                 */
@@ -55,36 +52,20 @@ function App() {
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loggedIn, tableFilter, itemToEdit]);
+  }, [loggedIn, tableFilter, itemToEdit, deleteAppear, addAppear]);
 
   /* -------------------------------------------------------------------------- */
   /*                                  Handlers                                  */
   /* -------------------------------------------------------------------------- */
 
-  const handleTableNameChangeDelete = (event) => {
-    setTableNameDelete(event.target.value);
-  };
-
-  const handleTableNameChangeAdd = (event) => {
-    setTableNameAdd(event.target.value);
-  };
-
-  const handleItemIdDeleteChange = (event) => {
-    setItemDelete(event.target.value);
-  };
-
   const handleEditValueUpdate = (key, value) => {
     setEditedDataUpdate({ ...editedDataUpdate, [key]: value });
-  };
-
-  const handleEditValueAdd = (key, value) => {
-    setEditedDataAdd({ ...editedDataAdd, [key]: value });
   };
 
   const handleTableFilterChange = (event) => {
     setTableFilter(event.target.value);
   };
-/* -------------------------------------------------------------------------- */
+  /* -------------------------------------------------------------------------- */
   /*                                   Stat                                     */
   /* -------------------------------------------------------------------------- */
 
@@ -100,22 +81,22 @@ function App() {
 
 
   const handleTableNameChange = (event) => {
-      const selectedTableName = event.target.value;
+    const selectedTableName = event.target.value;
 
-      if (!selectedTableName) {
-        setValueOptions([]);
+    if (!selectedTableName) {
+      setValueOptions([]);
 
-      }
-      setSelectedItem("");
-      setSelectedStat("");
+    }
+    setSelectedItem("");
+    setSelectedStat("");
 
-      setTableName(selectedTableName);
+    setTableName(selectedTableName);
   }
 
   const handleItemChange = (event) => {
-      const selectedValue = event.target.value;
-      setSelectedItem(selectedValue);
-      setChangeData({});
+    const selectedValue = event.target.value;
+    setSelectedItem(selectedValue);
+    setChangeData({});
 
   };
 
@@ -133,17 +114,17 @@ function App() {
   }, [tableName]);
 
   // Check conditions to determine if the button should be disabled
-  const isButtonDisabled = tableName === '' || tableName === null || 
-  selectItem === '' || selectItem === null ||
-  selectStat === '' || selectStat === null;
+  const isButtonDisabled = tableName === '' || tableName === null ||
+    selectItem === '' || selectItem === null ||
+    selectStat === '' || selectStat === null;
 
-    const handleButtonClick = () => {
-      //generate the graph
-      console.log("Clicked the button")
-      // Query the database to see if there is data to display as statistics
-      fetchChanges();
-      // There needs to be two points of data to display
-    };
+  const handleButtonClick = () => {
+    //generate the graph
+    console.log("Clicked the button")
+    // Query the database to see if there is data to display as statistics
+    fetchChanges();
+    // There needs to be two points of data to display
+  };
 
   const fetchItems = () => {
     if (tableName) {
@@ -156,7 +137,7 @@ function App() {
         .catch((e) => {
           latestResponseAdd("failed");
         });
-      }
+    }
   };
 
   const fetchChanges = () => {
@@ -170,7 +151,7 @@ function App() {
         .catch((e) => {
           latestResponseAdd("failed");
         });
-     }
+    }
   };
 
   /* -------------------------------------------------------------------------- */
@@ -223,10 +204,6 @@ function App() {
       });
   };
 
-  /* -------------------------------------------------------------------------- */
-  /*                                 Data List                                  */
-  /* -------------------------------------------------------------------------- */
-
   const handleCreateUser = () => {
     setCreateUserAppear(true);
   };
@@ -266,41 +243,12 @@ function App() {
   /*                                     Add                                    */
   /* -------------------------------------------------------------------------- */
 
-  const handleRetrieveAddData = () => {
-    if (tableNameAdd) {
-      fetch(`http://localhost:${BACKEND_PORT}/get_table_attributes?table_name=${tableNameAdd}`)
-        .then((response) => response.json())
-        .then((data) => {
-          setRetrievedDataAdd(data.data);
-          console.log(data.data)
-        })
-        .catch((e) => {
-          latestResponseAdd("failed");
-        });
-    }
+  const handleBackAdd = () => {
+    setAddAppear(false);
   };
 
-  const handleAddDataSubmit = () => {
-    console.log(editedDataAdd)
-    // API call to submit the updated data
-    fetch(`http://localhost:${BACKEND_PORT}/add`, {
-      method: "PUT",
-      body: JSON.stringify({
-        tableName: tableNameAdd,
-        addData: editedDataAdd
-      }),
-      headers: {
-        "Content-type": "application/json; charset=UTF-8"
-      }
-    })
-      .then((response) => response.json())
-      .then((res) => {
-        setLatestResponseAdd(res.status);
-        console.log(res);
-      })
-      .catch((e) => {
-        setLatestResponseAdd("failed");
-      });
+  const handleAdd = () => {
+    setAddAppear(true);
   };
 
   /* -------------------------------------------------------------------------- */
@@ -355,27 +303,12 @@ function App() {
   /*                                   Delete                                   */
   /* -------------------------------------------------------------------------- */
 
-  const handleDeleteSubmit = () => {
-    console.log(itemIdDelete)
-    // Perform your API call here to submit the updated data
-    fetch(`http://localhost:${BACKEND_PORT}/delete`, {
-      method: "DELETE",
-      body: JSON.stringify({
-        tableName: tableNameAdd,
-        deleteId: itemIdDelete
-      }),
-      headers: {
-        "Content-type": "application/json; charset=UTF-8"
-      }
-    })
-      .then((response) => response.json())
-      .then((res) => {
-        setLatestResponseDelete(res.status);
-        console.log(res);
-      })
-      .catch((e) => {
-        setLatestResponseDelete("failed");
-      });
+  const handleBackDelete = () => {
+    setDeleteAppear(false);
+  };
+
+  const handleDelete = () => {
+    setDeleteAppear(true);
   };
 
   /* -------------------------------------------------------------------------- */
@@ -406,6 +339,24 @@ function App() {
           <></>
       }
 
+      {
+        deleteAppear ?
+          <div className="popup">
+            <DeleteForm onBack={handleBackDelete} />
+          </div>
+          :
+          <></>
+      }
+
+      {
+        addAppear ?
+          <div className="popup">
+            <AddForm onBack={handleBackAdd} />
+          </div>
+          :
+          <></>
+      }
+
       <nav className="navbar">
         <ul>
           <NavLink style={({ isActive }) => ({
@@ -428,31 +379,43 @@ function App() {
           })} to="/admin">
             Admin
           </NavLink>
-          {!loggedIn ?
-            <button className="login-button" onClick={handleLogin}>
-              Login
-            </button>
-            :
-            <NavLink className="login-button" to="/" onClick={handleLogout}>
-              Logout
-            </NavLink>
+
+          <div className="login-zone">
+            {!loggedIn ?
+              <button className="login-button" onClick={handleLogin}>
+                Login
+              </button>
+              :
+              <NavLink className="login-button" to="/" onClick={handleLogout}>
+                Logout
+              </NavLink>
             }
 
-          <button className="login-button" onClick={handleCreateUser}>
-            Create User
-          </button>
+            <button className="login-button" onClick={handleCreateUser}>
+              Create User
+            </button>
+          </div>
         </ul>
       </nav>
 
       <div className="main">
         <div className="leftbar">
-
+          <button style={{
+            visibility: validateUser(loggedInUsers[0]) > 1 ? '' : 'hidden'
+          }} className="admin-button" onClick={handleDelete}>
+            Delete
+          </button>
+          <button style={{
+            visibility: validateUser(loggedInUsers[0]) > 1 ? '' : 'hidden'
+          }} className="admin-button" onClick={handleAdd}>
+            Add
+          </button>
         </div>
         <div className="rightbar">
 
           {/* ----------------------------- sort buttons -------------------------- */}
           <select
-            className="input"
+            className="input-filter"
             onChange={handleTableFilterChange}
             value={tableFilter}
           >
@@ -469,57 +432,6 @@ function App() {
               <Route path="/ula" element={<InventoryList className="table" data={tableData} user="ula" setEditID={setItemToEdit} />} />
               <Route path="/admin" element={<InventoryList className="table" data={tableData} user="admin" setEditID={setItemToEdit} />} />
             </Routes>
-          </div>
-
-          {/* -------------------------------- add -------------------------------- */}
-
-          <div className="itembox">
-            <h2>Add an item to the table selected</h2>
-            <select
-              className="input"
-              onChange={handleTableNameChangeAdd}
-              value={tableNameAdd}
-            >
-              <option value="consumable">consumable</option>
-              <option value="consumable_location">consumable_location</option>
-              <option value="machine">machine</option>
-              <option value="machine_location">machine_location</option>
-              <option value="non_consumable">non_consumable</option>
-              <option value="non_consumable_location">non_consumable_location</option>
-              <option value="room">room</option>
-              <option value="storage_medium">storage_medium</option>
-              <option value="storage_medium_location">storage_medium_location</option>
-            </select>
-
-            <button type="submit" onClick={handleRetrieveAddData}>
-              Retrieve Data
-            </button>
-
-            {retrievedDataAdd && (
-              <div className="retrieved-data">
-                <h3>Data to Add</h3>
-                {Object.entries(retrievedDataAdd).map(([key, value]) => (
-                  <div key={key} className="data-box">
-                    <label className="data-label">
-                      {value}:
-                    </label>
-                    <input
-                      type="text"
-                      className="input data-value"
-                      onChange={(e) => handleEditValueAdd(value, e.target.value)}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <button type="submit" onClick={handleAddDataSubmit}>
-              Submit Add Data
-            </button>
-
-            <label className="query-status">
-              {latestResponseAdd}
-            </label>
           </div>
 
           {/* -------------------------------- update ----------------------------- */}
@@ -562,85 +474,49 @@ function App() {
             :
             <></>
           }
-
-          {/* -------------------------------- delete ----------------------------- */}
-
-          <div className="itembox">
-            <h2>This will delete an item to the selected table:</h2>
-            <select
-              className="input"
-              onChange={handleTableNameChangeDelete}
-              value={tableNameDelete}
-            >
-              <option value="consumable">consumable</option>
-              <option value="consumable_location">consumable_location</option>
-              <option value="machine">machine</option>
-              <option value="machine_location">machine_location</option>
-              <option value="non_consumable">non_consumable</option>
-              <option value="non_consumable_location">non_consumable_location</option>
-              <option value="room">room</option>
-              <option value="storage_medium">storage_medium</option>
-              <option value="storage_medium_location">storage_medium_location</option>
-            </select>
-            <input
-              className="input"
-              type="text"
-              placeholder="Item ID"
-              onChange={handleItemIdDeleteChange}
-              value={itemIdDelete}
-            />
-
-            <button type="submit" onClick={handleDeleteSubmit}>
-              Submit Delete
-            </button>
-
-            <label className="query-status">
-              {latestResponseDelete}
-            </label>
-          </div>
           <div className="itembox">
             <h2> Statistics Generator</h2>
             <select className="input" onChange={handleTableNameChange} value={tableName} >
-                <option value="">Select a table</option>
-                {tableNameOptions.map((value) => (
+              <option value="">Select a table</option>
+              {tableNameOptions.map((value) => (
                 <option value={value}>
-                    {value}
+                  {value}
                 </option>
-                ))}
+              ))}
             </select>
 
             <select className="input" onChange={handleItemChange} value={selectItem} >
-                <option value="">Select a value</option>
-                {valueOptions.map((value) => (
+              <option value="">Select a value</option>
+              {valueOptions.map((value) => (
                 <option value={value}>
-                    {value}
+                  {value}
                 </option>
-                ))}
+              ))}
             </select>
 
             <select className="input" onChange={handleStatChange} value={selectStat} >
-                <option value="">Select a value</option>
-                {tableName=="consumable" && (
-                  consumableStatOptions.map((stat) => (
-                    <option value={stat}>
-                        {stat}
-                    </option>
-                    ))
-                )}
-                {tableName=="non_consumable" && (
-                  nonconsumableStatOptions.map((stat) => (
-                    <option value={stat}>
-                        {stat}
-                    </option>
-                    ))
-                )}
-                {tableName=="machine" && (
-                  machineStatOptions.map((stat) => (
-                    <option value={stat}>
-                        {stat}
-                    </option>
-                    ))
-                )}
+              <option value="">Select a value</option>
+              {tableName == "consumable" && (
+                consumableStatOptions.map((stat) => (
+                  <option value={stat}>
+                    {stat}
+                  </option>
+                ))
+              )}
+              {tableName == "non_consumable" && (
+                nonconsumableStatOptions.map((stat) => (
+                  <option value={stat}>
+                    {stat}
+                  </option>
+                ))
+              )}
+              {tableName == "machine" && (
+                machineStatOptions.map((stat) => (
+                  <option value={stat}>
+                    {stat}
+                  </option>
+                ))
+              )}
             </select>
 
             {/* Submit button with disabled attribute based on conditions */}
@@ -656,15 +532,10 @@ function App() {
                 <ScatterPlot data={changeData} />
               </div>
             )}
-        </div>
-        
-
           </div>
-
-        </div> 
-    
-    </div>
-      
+        </div>
+      </div>
+    </div >
   );
 }
 

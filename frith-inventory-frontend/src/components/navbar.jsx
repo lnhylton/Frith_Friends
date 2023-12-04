@@ -3,7 +3,7 @@
  * version: 4/16/2023
  */
 import React from 'react';
-import {Link} from "react-router-dom"
+import { Link } from "react-router-dom"
 
 const Navbar = () => {
     return (
