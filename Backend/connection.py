@@ -3,6 +3,8 @@ from flask_cors import CORS
 import mysql.connector
 import ast
 import password_backend
+import json
+from datetime import datetime
 
 BACKEND_PORT = 5001
 
@@ -11,7 +13,7 @@ CORS(app)
 
 config = {
     'host': 'localhost',
-    'user': 'admin',
+    'user': 'Admin',
     'password': 'frith',
     'database': 'frith_friends'
 }
@@ -44,7 +46,20 @@ def add():
 
         # Using parameterized query to add a specific item by its ID
         cursor.execute(f"INSERT INTO {data['tableName']} SET {addData}")
+   # Get timestamp value and adding it to the data
+        tableName = data['tableName'] 
+        changeDataDict = data['addData']
+        current_timestamp = datetime.now()
+        formatted_timestamp = current_timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        changeDataDict['change_timestamp'] = formatted_timestamp
 
+        # # Convert data into sql format and get new table name
+        changeData = parse_dictionary(changeDataDict)
+        tableName+="_changes"
+
+        # Insert data into database
+        print(f"INSERT INTO {tableName} SET {changeData}");
+        cursor.execute(f"INSERT INTO {tableName} SET {changeData}")
         conn.commit()
         cursor.close()
         conn.close()
@@ -52,33 +67,49 @@ def add():
 
     except Exception as e:
         response = {"status": "error", "message": str(e)}
-
+    finally:
+        cursor.close()
+        conn.close()
     return jsonify(response)
 
 @app.route('/update', methods=["PUT"])
 def update():
     
-    #try:
-    # print(request.json)
-    data = request.json
-    table_id_col = get_item_ids(data['tableName'])
-    conn = mysql.connector.connect(**config)
-    cursor = conn.cursor()
-    updateData = parse_dictionary(data['updateData'])
 
-    print(data)
+    try:
+        # print(request.json)
+        data = request.json
+        table_id_col = get_item_ids(data['tableName'])
+        conn = mysql.connector.connect(**config)
+        cursor = conn.cursor()
+        updateData = parse_dictionary(data['updateData'])
 
-    # print(updateData)
+        print(f"UPDATE {data['tableName']} SET {updateData} WHERE {table_id_col} = {data['itemId']}")
+        # Using parameterized query to update a specific item by its ID
+        cursor.execute(f"UPDATE {data['tableName']} SET {updateData} WHERE {table_id_col} = {data['itemId']}")
 
-    print(f"UPDATE {data['tableName']} SET {updateData} WHERE {table_id_col} = {data['itemId']}")
-    # Using parameterized query to update a specific item by its ID
-    cursor.execute(f"UPDATE {data['tableName']} SET {updateData} WHERE {table_id_col} = {data['itemId']}")
-    conn.commit()
-    cursor.close()
-    conn.close()
-    response = {"status": "success"}
-    #except Exception as e:
-    #    response = {"status": "error", "message": str(e)}
+        # Get timestamp value and adding it to the data
+        tableName = data['tableName'] 
+        changeDataDict = data['updateData']
+        current_timestamp = datetime.now()
+        formatted_timestamp = current_timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        changeDataDict['change_timestamp'] = formatted_timestamp
+
+        # # Convert data into sql format and get new table name
+        changeData = parse_dictionary(changeDataDict)
+        tableName+="_changes"
+
+        # Insert data into database
+        print(f"INSERT INTO {tableName} SET {changeData}");
+        cursor.execute(f"INSERT INTO {tableName} SET {changeData}")
+
+        conn.commit()
+        response = {"status": "success"}
+    except Exception as e:
+        response = {"status": "error", "message": str(e)}
+    finally:
+        cursor.close()
+        conn.close()
     return jsonify(response)
 
 
@@ -139,6 +170,39 @@ def get_data():
     except Exception as e:
         conn.close()
         return jsonify({"status": "error", "message": str(e)})
+
+# TODO
+# take an array of tables
+# join all tables
+# add a new column to list with [bottom level location, ..., top level locatoion]
+#    * Locations are recursively related
+@app.route('/get_table', methods=['GET'])
+def get_table():
+    table_name = request.args.get('table_name')
+    
+    if table_name is None:
+        return jsonify({"status": "error", "message": "Table name and row ID are required."})
+
+    conn = mysql.connector.connect(**config)
+    cursor = conn.cursor()
+    
+    try:
+        # Use a parameterized query to retrieve data from the specified table and row
+        cursor.execute(f'SELECT * FROM {table_name}')
+        rows = cursor.fetchall()
+        conn.close()
+        
+
+        # Get column names from the cursor description
+        column_names = [desc[0] for desc in cursor.description]
+
+        # Convert rows to a list of dictionaries
+        data = [dict(zip(column_names, row)) for row in rows]
+
+        return jsonify({"status": "success", "data": data})
+    except Exception as e:
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)})
     
 @app.route('/get_table_attributes', methods=['GET'])
 def get_table_attributes():
@@ -181,7 +245,6 @@ def login():
     data = request.json
     enteredUsername = data['username']
     enteredPassword = data['password']
-
     conn = mysql.connector.connect(**config)
     cursor = conn.cursor()
     
@@ -191,9 +254,28 @@ def login():
         userPasswordHash = cursor.fetchone()[0];
         if (password_backend.verify_password(userPasswordHash, enteredPassword)):
             response = {"status": "success"}
+            cursor.execute(f"UPDATE user_authentication SET UserIsLoggedIn=1 WHERE Username='{enteredUsername}'")
+
         else:
             response = {"status": "error", "message": "Incorrect password"}
 
+    except Exception as e:
+        response = {"status": "error", "message": str(e)}
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return jsonify(response)
+
+@app.route('/logout', methods=["POST"])
+def logout():
+    data = get_logged_in_users().json['data'][0]
+
+    conn = mysql.connector.connect(**config)
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute(f"UPDATE user_authentication SET UserIsLoggedIn=0 WHERE Username='{data['Username']}'")
+        response = {"status": "success"}
     except Exception as e:
         response = {"status": "error", "message": str(e)}
 
@@ -236,6 +318,165 @@ def create_user():
     cursor.close()
     conn.close()
     return jsonify(response)
+
+@app.route('/delete_user', methods=['DELETE'])
+def delete_user():
+    try:
+        username = request.json['username']
+
+        conn = mysql.connector.connect(**config)
+        cursor = conn.cursor()
+
+        # Using parameterized query to update a specific item by its ID
+        cursor.execute(f"DELETE FROM User_Authentication WHERE Username='{username}'")
+        conn.commit()
+        cursor.close()
+        conn.close()
+        response = {"status": "success"}
+        #except Exception as e:
+        #    response = {"status": "error", "message": str(e)}
+        return jsonify(response)
+    except Exception as e:
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)})
+
+@app.route('/get_table_data', methods=["PUT"])
+def get_table_data():
+    table_names = request.json['tableName']
+    
+    if table_names is None:
+        return jsonify({"status": "error", "message": "Table name is required."})
+
+    conn = mysql.connector.connect(**config)
+    cursor = conn.cursor()
+    
+    try:
+        # Use a parameterized query to retrieve data from the specified table and row
+        data = []
+        for table in table_names:
+            cursor.execute(f"""WITH RECURSIVE Storage_Medium_Path AS (
+            SELECT
+                child_sm_id,
+                parent_sm_id,
+                CAST(parent_sm_id AS CHAR(200)) AS parent_ids
+            FROM Storage_Medium_Location
+
+            UNION ALL
+
+            SELECT
+                sml.child_sm_id,
+                sml.parent_sm_id,
+                CONCAT(smp.parent_ids, ',', sml.parent_sm_id)
+            FROM Storage_Medium_Path smp
+            JOIN Storage_Medium_Location sml ON smp.child_sm_id = sml.parent_sm_id
+            )
+
+            SELECT *
+            FROM (
+            SELECT
+                c.*,
+                cl.sm_id,
+                smp.parent_ids,
+                ROW_NUMBER() OVER (PARTITION BY c.{get_item_ids(table)} ORDER BY LENGTH(smp.parent_ids) DESC) AS rn
+            FROM {table} c
+            LEFT JOIN {table}_Location cl ON c.{get_item_ids(table)} = cl.{get_item_ids(table)}
+            LEFT JOIN Storage_Medium_Path smp ON cl.sm_id = smp.child_sm_id
+            ) AS ranked
+            WHERE rn = 1""")
+
+            rows = cursor.fetchall()
+            # Get column names from the cursor description
+            column_names = [desc[0] for desc in cursor.description]
+
+            # Convert rows to a list of dictionaries
+            data += [dict(zip(column_names, row)) for row in rows]
+
+        for row in data:
+            del row['rn']
+            
+        conn.close()
+
+        return jsonify({"status": "success", "data": data})
+    except Exception as e:
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)})
+    
+@app.route('/get_logged_in_users', methods=['GET'])
+def get_logged_in_users():
+    conn = mysql.connector.connect(**config)
+    cursor = conn.cursor()
+    
+    try:
+        data = []
+        # Use a parameterized query to retrieve data from the specified table and row
+        cursor.execute(f'SELECT Username, UserType FROM user_authentication WHERE UserIsLoggedIn = 1;')
+        users = cursor.fetchall()
+        column_names = [desc[0] for desc in cursor.description]
+
+        # Convert rows to a list of dictionaries
+        data += [dict(zip(column_names, user)) for user in users]
+        conn.close()
+        return jsonify({"status": "success", "data": data})
+    except Exception as e:
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)})
+
+@app.route('/get_items', methods=['GET'])
+def get_items():
+    table_name = request.args.get('table_name')
+    if table_name is None:
+        return jsonify({"status": "error", "message": "Table name is required."})
+    try:
+        conn = mysql.connector.connect(**config)
+        cursor = conn.cursor()
+        # Use a parameterized query to retrieve data from the specified table
+        cursor.execute(f'SELECT name FROM {table_name}')
+        items = cursor.fetchall()
+
+        item_names = [item[0] for item in items]
+        print(item_names)
+
+        conn.close() 
+        # Convert the retrieved row to a dictionary for JSON response
+        return jsonify({"status": "success", "data": item_names})
+
+    except Exception as e:
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)})
+
+@app.route('/get_changes', methods=['GET'])
+def get_changes():
+    table_name = request.args.get('table_name')
+    item_name = request.args.get('item_name')
+    query = request.args.get('query')
+    if table_name is None or item_name is None or query is None:
+        return jsonify({"status": "error", "message": "Table name and item name is required."})
+    try:
+        table_name += "_changes"
+        conn = mysql.connector.connect(**config)
+        cursor = conn.cursor()
+        # Use a parameterized query to retrieve data from the specified table
+        print(f"SELECT {query}, change_timestamp FROM {table_name} WHERE name='{item_name}'")
+        cursor.execute(f"SELECT {query}, change_timestamp FROM {table_name} WHERE name='{item_name}'")
+        items = cursor.fetchall()
+
+        item_names = [item[0] for item in items]
+        print(item_names)
+        timestamps = [item[1].strftime('%Y-%m-%d %H:%M:%S') for item in items]
+        #timestamps = [item[1] for item in items]
+
+        data = [{'x': timestamp, 'y': item} for item, timestamp in zip(item_names, timestamps)]
+
+        print(data)
+
+        conn.close() 
+        # Convert the retrieved row to a dictionary for JSON response
+        return jsonify({"status": "success", "data": data})
+
+    except Exception as e:
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)})
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=BACKEND_PORT)
