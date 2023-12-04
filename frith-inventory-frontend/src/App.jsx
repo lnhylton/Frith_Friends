@@ -6,6 +6,7 @@ import InventoryList from './components/data_list.jsx';
 import './App.css';
 import LoginForm from './login.jsx'; // Assuming the login file is in the same directory
 import FrithLogo from './components/frith_logo.jsx'
+import CreateUserForm from './components/create_user.jsx';
 const BACKEND_PORT = 5001
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
   const [waitLogin, setWaitLogin] = useState(false); // Login state
   const [loggedIn, setLoggedIn] = useState(false); // Login state
   const [loggedInUsers, setLoggedInUsers] = useState({});
+  const [createUserAppear, setCreateUserAppear] = useState(false);
 
   const [editID, setEditID] = useState({ id: 0, disp: false }); // ID to edit
 
@@ -97,12 +99,12 @@ function App() {
   /* -------------------------------------------------------------------------- */
 
   const handleBackToMainContent = () => {
-    setLoggedIn(true);
     setWaitLogin(false);
   };
 
   const handleLogin = () => {
     setWaitLogin(true);
+    setLoggedIn(true);
   };
 
   const handleLogout = () => {
@@ -139,6 +141,18 @@ function App() {
         console.log("failed")
       });
   };
+
+  /* -------------------------------------------------------------------------- */
+  /*                                 Data List                                  */
+  /* -------------------------------------------------------------------------- */
+
+  const handleCreateUser = () => {
+    setCreateUserAppear(true);
+  };
+
+  const handleBackCreateUser = () => {
+    setCreateUserAppear(false);
+  }
 
   /* -------------------------------------------------------------------------- */
   /*                                 Data List                                  */
@@ -302,6 +316,15 @@ function App() {
           <></>
       }
 
+      {
+        createUserAppear ?
+          <div className="popup">
+            <CreateUserForm onCreate={handleBackCreateUser} onBack={handleBackCreateUser} />
+          </div>
+          :
+          <></>
+      }
+
       <nav className="navbar">
         <ul>
           <NavLink style={({ isActive }) => ({
@@ -330,6 +353,10 @@ function App() {
             <button className="login-button" onClick={handleLogout}>
               Logout
             </button>}
+
+            <button className="login-button" onClick={handleCreateUser}>
+              Create User
+            </button>
         </ul>
       </nav>
 

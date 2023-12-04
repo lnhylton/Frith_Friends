@@ -341,6 +341,9 @@ def get_table_data():
             # Convert rows to a list of dictionaries
             data += [dict(zip(column_names, row)) for row in rows]
 
+        for row in data:
+            del row['rn']
+            
         conn.close()
 
         return jsonify({"status": "success", "data": data})
