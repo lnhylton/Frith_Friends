@@ -6,6 +6,7 @@ import Guest from "./pages/Guest"
 import ULA from "./pages/ULA"
 import Admin from "./pages/Admin"
 import './App.css';
+import Popup from './components/popup.jsx'
 import LoginForm from './login'; // Assuming the login file is in the same directory
 import FrithLogo from './components/frith_logo.jsx'
 const BACKEND_PORT = 5001
@@ -158,6 +159,20 @@ function App() {
         setLatestResponseUpdate("failed");
       });
   };
+  
+  /* -------------------------------------------------------------------------- */
+  /*                                   PopOuts                                   */
+  /* -------------------------------------------------------------------------- */
+
+  const [isPopupOpen, setPopupOpen] = useState(false);
+
+  const openPopup = () => {
+    setPopupOpen(true);
+  };
+
+  const closePopup = () => {
+    setPopupOpen(false);
+  };
 
   /* -------------------------------------------------------------------------- */
   /*                                   Delete                                   */
@@ -186,6 +201,15 @@ function App() {
       });
   };
 
+  const onAddClick = () => {
+    // Your logic to generate content goes here
+    return (
+      <div>
+        <h2>Dynamic Popup Content</h2>
+        <p>This content is generated dynamically.</p>
+      </div>
+    );
+  };
   /* -------------------------------------------------------------------------- */
   /*                                    HTML                                    */
   /* -------------------------------------------------------------------------- */
@@ -230,6 +254,17 @@ function App() {
             <FrithLogo className="FrithLogo" />Frith Inventory
           </div>
 
+
+          {/*Other buttons to handle popouts */}
+
+          <div>
+            <button onClick={openPopup}>Open Popup</button>
+
+            <Popup isOpen={isPopupOpen} onClose={closePopup}>
+              <h2>Popup Content</h2>
+              <p>This is some content inside the popup.</p>
+            </Popup>
+          </div>
           {/* -------------------------------- add -------------------------------- */}
 
           <div className="itembox">
