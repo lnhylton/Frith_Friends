@@ -369,7 +369,7 @@ function App() {
       }
 
       {
-          deleteUserAppear ?
+        deleteUserAppear ?
           <div className="popup">
             <DeleteUserForm onBack={handleBackDeleteUser} />
           </div>
@@ -400,25 +400,26 @@ function App() {
             Admin
           </NavLink>
 
-          <div className="login-zone">
-            {!loggedIn ?
-              <button className="login-button" onClick={handleLogin}>
-                Login
-              </button>
-              :
-              <NavLink className="login-button" to="/" onClick={handleLogout}>
-                Logout
-              </NavLink>
-            }
-
+          <div style={{
+            visibility: validateUser(loggedInUsers) > 1 ? '' : 'hidden'
+          }} className="admin-login-zone">
             <button className="login-button" onClick={handleCreateUser}>
               Create User
             </button>
 
-          <button className="login-button" onClick={handleDeleteUser}>
-            Delete User
-          </button>
+            <button className="login-button" onClick={handleDeleteUser}>
+              Delete User
+            </button>
           </div>
+          {!loggedIn ?
+            <button className="login-button" onClick={handleLogin}>
+              Login
+            </button>
+            :
+            <NavLink className="login-button" to="/" onClick={handleLogout}>
+              Logout
+            </NavLink>
+          }
         </ul>
       </nav>
 
