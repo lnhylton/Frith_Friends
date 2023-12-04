@@ -1,0 +1,84 @@
+/*
+ * author: Colton Tshudy
+ * version: 4/16/2023
+ */
+import { DataGrid, GridToolbarContainer, GridToolbarExport } from "@mui/x-data-grid";
+import { Box } from "@mui/material";
+import React from 'react';
+import "../style/table.css"
+
+const InventoryList = (props) => {
+    // Default props
+    const {
+        data,
+        className,
+        user,
+        onClick
+    } = props;
+
+    const renderEditButton = (params) => {
+        return (
+            <button className="button">
+                Edit
+            </button>
+        )
+    }
+
+    // Convert dictionary to an array of objects
+    const rows = Object.entries(data.data).map(([id, rowData]) => ({ id, ...rowData }));
+
+    // Define columns based on the keys of the first object in the dictionary
+    const cols = Object.keys(rows[0] || {}).map((key) => {
+        // Exclude the 'id' column
+        if (key !== 'id') {
+            return {
+                field: key,
+                headerName: key,
+                flex: 1,
+                renderCell: (params) => {
+                    // Check if param.value is a link
+                    if (isLink(params.value)) {
+                        return <a href={params.value} target="_blank" rel="noopener noreferrer">{params.value}</a>;
+                    }
+                    // Default rendering if not a link
+                    return params.value;
+                },
+            };
+        }
+        return null;
+    }).filter(Boolean);
+
+    if (user && (user == "admin" || user == "ula")) {
+        cols.push({
+            field: "edit",
+            headerName: "edit",
+            flex: 1,
+            renderCell: renderEditButton,
+            disableClickEventBubbling: true,
+        })
+    }
+
+    return (
+        <>
+            <Box className={className}>
+                <DataGrid
+                    columns={cols}
+                    rows={rows}
+                    initialState={{
+                        ...data.initialState,
+                        pagination: { paginationModel: { pageSize: 100 } },
+                    }}
+                    pageSizeOptions={[10, 25, 100]}
+                />
+            </Box>
+        </>
+    )
+}
+
+// Function to check if a value is a link
+const isLink = (value) => {
+    return typeof value === 'string' && value.startsWith('http');
+};
+
+
+export default InventoryList;

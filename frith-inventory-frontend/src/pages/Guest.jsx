@@ -3,15 +3,14 @@
  * version: 4/16/2023
  */
 import React from 'react';
-import GuestList from '../components/guest_user_list';
-import data from '../testdata/data.json'
+import InventoryList from '../components/data_list';
+import '../style/guest.css'
 
-const Guest = () => {
+const Guest = (data) => {
     return (
         <>
-            <div>
-                Guest
-                {/* <GuestList data={data} /> */}
+            <div className="guest">
+                <InventoryList data={data} className="table"/>
             </div>
         </>
     )

@@ -3,12 +3,14 @@
  * version: 4/16/2023
  */
 import React from 'react';
+import InventoryList from '../components/data_list';
+import '../style/guest.css'
 
-const Admin = () => {
+const Admin = (data) => {
     return (
         <>
-            <div>
-                Admin
+            <div className="guest">
+                <InventoryList className="table" data={data} user="admin"/>
             </div>
         </>
     )

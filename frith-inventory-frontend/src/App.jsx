@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import React from "react";
-import { Link, Routes, Route } from "react-router-dom"
+import { NavLink, Routes, Route } from "react-router-dom"
 
 import Guest from "./pages/Guest"
 import ULA from "./pages/ULA"
@@ -109,7 +109,6 @@ function App() {
         .then((response) => response.json())
         .then((data) => {
           setTableData(data.data)
-          console.log(data.data)
         })
         .catch((e) => {
           console.log("failed")
@@ -167,7 +166,7 @@ function App() {
       fetch(`http://localhost:${BACKEND_PORT}/get_data?table_name=${tableNameUpdate}&row_id=${itemIdUpdate}`)
         .then((response) => response.json())
         .then((data) => {
-          setRetrievedDataUpdate(data.data);
+          setRetrievedData(data.data);
           setEditedDataUpdate(data.data);
           console.log(data.data);
         })
@@ -233,43 +232,59 @@ function App() {
 
   return (
     <div className="App">
-      <nav>
-        <ul>
-          <li>
-            <Link to="/">Guest</Link>
-          </li>
-          <li>
-            <Link to="/ula">ULA</Link>
-          </li>
-          <li>
-            <Link to="/admin">Admin</Link>
-          </li>
-        </ul>
+      <div className="App-header">
+        <FrithLogo className="FrithLogo" /> Frith Inventory
+      </div>
 
-        <hr />
-      </nav>
-      <Routes>
-        <Route path="/" element={<Guest />} />
-        <Route path="/ula" element={<ULA />} />
-        <Route path="/admin" element={<Admin />} />
-      </Routes>
+      {
+            loggedIn ?
+              <div className="popup">
+                <LoginForm onLogin={handleLogout} onBack={handleBackToMainContent} />
+              </div>
+              :
+              <></>
+          }
 
+      <nav className="navbar">
+            <ul>
+              <NavLink style={({ isActive }) => ({
+                color: isActive ? '#fff' : '',
+                background: isActive ? '#888' : ''
+              })} to="/">
+                Guest
+              </NavLink>
+              <NavLink style={({ isActive }) => ({
+                color: isActive ? '#fff' : '',
+                background: isActive ? '#888' : ''
+              })} to="/ula">
+                ULA
+              </NavLink>
+              <NavLink style={({ isActive }) => ({
+                color: isActive ? '#fff' : '',
+                background: isActive ? '#888' : ''
+              })} to="/admin">
+                Admin
+              </NavLink>
+              {!loggedIn ? (
+                <button className="login-button" onClick={handleLogin}>
+                  Login
+                </button>
+              ) : null}
+            </ul>
+          </nav>
 
-      {!loggedIn ? (
-        <button className="login-button" onClick={handleLogin}>
-          Login Page
-        </button>
-      ) : null}
-
-      {loggedIn ? (
-        <div>
-          <LoginForm onLogin={handleLogout} onBack={handleBackToMainContent} />
+      <div className="main">
+        <div className="leftbar">
+          
         </div>
-      ) : (
-        <div>
-          <div className="App-header">
-            <FrithLogo className="FrithLogo" />Frith Inventory
-          </div>
+        <div className="rightbar">
+          {/* ---------------------------- navigation ----------------------------- */}
+          
+          <Routes>
+            <Route path="/" element={<Guest data={tableData} />} />
+            <Route path="/ula" element={<ULA data={tableData} />} />
+            <Route path="/admin" element={<Admin data={tableData} />} />
+          </Routes>
 
           {/* -------------------------------- add -------------------------------- */}
 
@@ -416,7 +431,7 @@ function App() {
             </label>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

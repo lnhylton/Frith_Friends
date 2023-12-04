@@ -3,12 +3,14 @@
  * version: 4/16/2023
  */
 import React from 'react';
+import InventoryList from '../components/data_list';
+import '../style/guest.css'
 
-const ULA = () => {
+const ULA = (data) => {
     return (
         <>
-            <div>
-                ULA
+            <div className="guest">
+                <InventoryList className="table" data={data} user="ula"/>
             </div>
         </>
     )
