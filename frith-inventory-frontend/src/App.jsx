@@ -31,8 +31,7 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false); // Login state
   const [loggedInUsers, setLoggedInUsers] = useState({});
 
-  const [targetID, setTargetID] = useState(0); // Default ID
-  const [editActive, setEditActive] = useState(false);
+  const [editID, setEditID] = useState({ id: 0, disp: false }); // ID to edit
 
   /* -------------------------------------------------------------------------- */
   /*                                  useEffect                                 */
@@ -211,9 +210,15 @@ function App() {
   /*                                   Update                                   */
   /* -------------------------------------------------------------------------- */
 
+  const handleExitUpdate = () => {
+    setEditID({id: 0, disp: false})
+  }
+
   const handleRetrieveUpdateData = () => {
-    if (tableNameUpdate && itemIdUpdate) {
-      fetch(`http://localhost:${BACKEND_PORT}/get_data?table_name=${tableNameUpdate}&row_id=${itemIdUpdate}`)
+    console.log(tableFilter)
+    console.log(editID.id)
+    if (tableFilter && editID.id) {
+      fetch(`http://localhost:${BACKEND_PORT}/get_data?table_name=${tableFilter}&row_id=${editID.id}`)
         .then((response) => response.json())
         .then((data) => {
           setRetrievedDataUpdate(data.data);
@@ -315,7 +320,7 @@ function App() {
           })} to="/admin">
             Admin
           </NavLink>
-          {!loggedIn && loggedInUsers.length < 1 ?
+          {!loggedIn ?
             <button className="login-button" onClick={handleLogin}>
               Login
             </button>
@@ -348,8 +353,8 @@ function App() {
           <div className="guest">
             <Routes>
               <Route path="/" element={<InventoryList className="table" data={tableData} />} />
-              <Route path="/ula" element={<InventoryList className="table" data={tableData} user="ula" />} />
-              <Route path="/admin" element={<InventoryList className="table" data={tableData} user="admin" />} />
+              <Route path="/ula" element={<InventoryList className="table" data={tableData} user="ula" setEditID={setEditID} />} />
+              <Route path="/admin" element={<InventoryList className="table" data={tableData} user="admin" setEditID={setEditID} />} />
             </Routes>
           </div>
 
@@ -405,62 +410,45 @@ function App() {
           </div>
 
           {/* -------------------------------- update ----------------------------- */}
-
-          <div className="itembox">
-            <h2>Update an item located in the table below</h2>
-            <select
-              className="input"
-              onChange={handleTableNameChangeUpdate}
-              value={tableNameUpdate}
-            >
-              <option value="consumable">consumable</option>
-              <option value="consumable_location">consumable_location</option>
-              <option value="machine">machine</option>
-              <option value="machine_location">machine_location</option>
-              <option value="non_consumable">non_consumable</option>
-              <option value="non_consumable_location">non_consumable_location</option>
-              <option value="room">room</option>
-              <option value="storage_medium">storage_medium</option>
-              <option value="storage_medium_location">storage_medium_location</option>
-            </select>
-            <input
-              className="input"
-              type="text"
-              placeholder="Item ID"
-              onChange={handleItemIdChange}
-              value={itemIdUpdate}
-            />
-
-            <button type="submit" onClick={handleRetrieveUpdateData}>
-              Retrieve Data
-            </button>
-
-            {retrievedDataUpdate && (
-              <div className="retrieved-data">
-                <h3>Data to Update</h3>
-                {Object.entries(retrievedDataUpdate).map(([key, value]) => (
-                  <div key={key} className="data-box">
-                    <label className="data-label">
-                      {key}:
-                    </label>
-                    <input
-                      type="text"
-                      className="input data-value"
-                      value={editedDataUpdate[key]}
-                      onChange={(e) => handleEditValueUpdate(key, e.target.value)}
-                    />
+          {editID.disp ?
+            <div className="popup">
+              <div className="itembox">
+                <button type="exit" onClick={handleExitUpdate}>
+                  Exit
+                </button>
+                <button type="submit" onClick={handleRetrieveUpdateData}>
+                  Retrieve Data
+                </button>
+                {retrievedDataUpdate && (
+                  <div className="retrieved-data">
+                    <h3>Data to Update</h3>
+                    {Object.entries(retrievedDataUpdate).map(([key, value]) => (
+                      <div key={key} className="data-box">
+                        <label className="data-label">
+                          {key}:
+                        </label>
+                        <input
+                          type="text"
+                          className="input data-value"
+                          value={editedDataUpdate[key]}
+                          onChange={(e) => handleEditValueUpdate(key, e.target.value)}
+                        />
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            )}
-            <button type="submit" onClick={handleUpdateDataSubmit}>
-              Submit Updated Data
-            </button>
+                )}
+                <button type="submit" onClick={handleUpdateDataSubmit}>
+                  Submit Updated Data
+                </button>
 
-            <label className="query-status">
-              {latestResponseUpdate}
-            </label>
-          </div>
+                <label className="query-status">
+                  {latestResponseUpdate}
+                </label>
+              </div>
+            </div>
+            :
+            <></>
+          }
 
           {/* -------------------------------- delete ----------------------------- */}
 

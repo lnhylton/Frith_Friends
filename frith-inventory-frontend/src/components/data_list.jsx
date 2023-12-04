@@ -13,10 +13,17 @@ const InventoryList = (props) => {
         data,
         className,
         user,
+        setEditID
     } = props;
 
     const handler = (params) => {
-        console.log(params)
+        console.log(params.row)
+        for (const [key, value] of Object.entries(params.row)) {
+            if (key.indexOf("id") > 0) {
+                setEditID({id: value, disp: true})
+                return;
+            }
+        }
     }
 
     const renderEditButton = (params) => {
