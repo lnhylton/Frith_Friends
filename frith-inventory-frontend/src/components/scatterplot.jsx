@@ -38,6 +38,8 @@ const ScatterPlot = ({ data , stat}) => {
         .range([height, 0]);
       }
 
+  
+
     // Create scales
     const xScale = d3.scaleTime()
       .domain(d3.extent(data, d => new Date(d.x)))
