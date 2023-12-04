@@ -3,6 +3,7 @@ from flask_cors import CORS
 import mysql.connector
 import ast
 import password_backend
+import json
 
 BACKEND_PORT = 5001
 
@@ -135,6 +136,39 @@ def get_data():
         # Convert the retrieved row to a dictionary for JSON response
         columns = [desc[0] for desc in cursor.description]
         data = dict(zip(columns, row))
+        return jsonify({"status": "success", "data": data})
+    except Exception as e:
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)})
+
+# TODO
+# take an array of tables
+# join all tables
+# add a new column to list with [bottom level location, ..., top level locatoion]
+#    * Locations are recursively related
+@app.route('/get_table', methods=['GET'])
+def get_table():
+    table_name = request.args.get('table_name')
+    
+    if table_name is None:
+        return jsonify({"status": "error", "message": "Table name and row ID are required."})
+
+    conn = mysql.connector.connect(**config)
+    cursor = conn.cursor()
+    
+    try:
+        # Use a parameterized query to retrieve data from the specified table and row
+        cursor.execute(f'SELECT * FROM {table_name}')
+        rows = cursor.fetchall()
+        conn.close()
+        
+
+        # Get column names from the cursor description
+        column_names = [desc[0] for desc in cursor.description]
+
+        # Convert rows to a list of dictionaries
+        data = [dict(zip(column_names, row)) for row in rows]
+
         return jsonify({"status": "success", "data": data})
     except Exception as e:
         conn.close()

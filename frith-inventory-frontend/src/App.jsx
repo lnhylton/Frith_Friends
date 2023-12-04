@@ -26,7 +26,29 @@ function App() {
   const [retrievedDataAdd, setRetrievedDataAdd] = useState(null); // Store retrieved data
   const [editedDataAdd, setEditedDataAdd] = useState({});
 
+  // Holds the data displayed to the main table
+  const [tableData, setTableData] = useState({});
+
   const [loggedIn, setLoggedIn] = useState(false); // Login state
+
+  /* -------------------------------------------------------------------------- */
+  /*                                  useEffect                                 */
+  /* -------------------------------------------------------------------------- */
+
+  useEffect(() => {
+    // Runs on mount
+    getTableData()
+
+    // Runs on dismount
+    return () => {
+    };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /* -------------------------------------------------------------------------- */
+  /*                                  Handlers                                  */
+  /* -------------------------------------------------------------------------- */
 
   const handleTableNameChangeUpdate = (event) => {
     setTableNameUpdate(event.target.value);
@@ -74,6 +96,25 @@ function App() {
 
   const handleLogout = () => {
     setLoggedIn(false);
+  };
+
+  /* -------------------------------------------------------------------------- */
+  /*                                 Guest Data                                 */
+  /* -------------------------------------------------------------------------- */
+
+  const getTableData = () => {
+    const tableNameFilter = "consumable"
+    if (tableNameFilter) {
+      fetch(`http://localhost:${BACKEND_PORT}/get_table?table_name=${tableNameFilter}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setTableData(data.data)
+          console.log(data.data)
+        })
+        .catch((e) => {
+          console.log("failed")
+        });
+    }
   };
 
   /* -------------------------------------------------------------------------- */
@@ -208,9 +249,9 @@ function App() {
         <hr />
       </nav>
       <Routes>
-        <Route path="/" element={<Guest/>}/>
-        <Route path="/ula" element={<ULA/>}/>
-        <Route path="/admin" element={<Admin/>}/> 
+        <Route path="/" element={<Guest />} />
+        <Route path="/ula" element={<ULA />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
 
 
