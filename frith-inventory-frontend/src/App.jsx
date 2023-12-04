@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 import LoginForm from './login'; // Assuming the login file is in the same directory
-import FrithLogo from './components/frith_logo.jsx'
+import StatForm from './stats'; // Assuming the login file is in the same directory
+import ScatterPlot from './components/scatterplot.jsx';
+import FrithLogo from './components/frith_logo.jsx';
+//import LineChart from './components/line-chart';
+
 const BACKEND_PORT = 5001
 
 function App() {
@@ -53,6 +57,97 @@ function App() {
   const handleEditValueAdd = (key, value) => {
     setEditedDataAdd({ ...editedDataAdd, [key]: value });
   };
+
+  /* -------------------------------------------------------------------------- */
+  /*                                   Stat                                     */
+  /* -------------------------------------------------------------------------- */
+
+  const [tableNameOptions] = useState(["consumable", "non_consumable", "machine"]);
+  const [tableName, setTableName] = useState("");
+  const [valueOptions, setValueOptions] = useState([]);
+  const [selectItem, setSelectedItem] = useState("");
+  const [consumableStatOptions] = useState(["stock", "hidden"]);
+  const [nonconsumableStatOptions] = useState(["inventory_count", "hidden"]);
+  const [machineStatOptions] = useState(["functional"]);
+  const [selectStat, setSelectedStat] = useState("");
+  const [changeData, setChangeData] = useState({});
+
+
+  const handleTableNameChange = (event) => {
+      const selectedTableName = event.target.value;
+      
+      if (!selectedTableName) {
+        setValueOptions([]);
+
+      }
+      setSelectedItem("");
+      setSelectedStat("");
+
+      setTableName(selectedTableName);
+  }
+
+  const handleItemChange = (event) => {
+      const selectedValue = event.target.value;
+      setSelectedItem(selectedValue);
+      setChangeData({});
+      
+  };
+
+  const handleStatChange = (event) => {
+    const selectedStat = event.target.value;
+    setSelectedStat(selectedStat);
+    setChangeData({});
+  }
+
+
+  useEffect(() => {
+    if (tableName) {
+      fetchItems();
+    }
+  }, [tableName]);
+
+  // Check conditions to determine if the button should be disabled
+  const isButtonDisabled = tableName === '' || tableName === null || 
+  selectItem === '' || selectItem === null ||
+  selectStat === '' || selectStat === null;
+
+    const handleButtonClick = () => {
+      //generate the graph
+      console.log("Clicked the button")
+      // Query the database to see if there is data to display as statistics
+      fetchChanges();
+      // There needs to be two points of data to display
+    };
+
+  const fetchItems = () => {
+    if (tableName) {
+      fetch(`http://localhost:${BACKEND_PORT}/get_items?table_name=${tableName}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setValueOptions(data.data);
+          console.log(data.data)
+        })
+        .catch((e) => {
+          latestResponseAdd("failed");
+        });
+      }
+  };
+
+  const fetchChanges = () => {
+    if (selectItem) {
+      fetch(`http://localhost:${BACKEND_PORT}/get_changes?table_name=${tableName}&item_name=${selectItem}&query=${selectStat}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setChangeData(data.data);
+          console.log(data.data)
+        })
+        .catch((e) => {
+          latestResponseAdd("failed");
+        });
+     }
+  };
+ 
+
 
   /* -------------------------------------------------------------------------- */
   /*                                   Login                                    */
@@ -343,7 +438,70 @@ function App() {
               {latestResponseDelete}
             </label>
           </div>
-        </div>
+          
+          
+          <div className="itembox">
+            <h2> Statistics Generator</h2>
+            <select className="input" onChange={handleTableNameChange} value={tableName} >
+                <option value="">Select a table</option>
+                {tableNameOptions.map((value) => (
+                <option value={value}>
+                    {value}
+                </option>
+                ))}
+            </select>
+
+            <select className="input" onChange={handleItemChange} value={selectItem} >
+                <option value="">Select a value</option>
+                {valueOptions.map((value) => (
+                <option value={value}>
+                    {value}
+                </option>
+                ))}
+            </select>
+
+            <select className="input" onChange={handleStatChange} value={selectStat} >
+                <option value="">Select a value</option>
+                {tableName=="consumable" && (
+                  consumableStatOptions.map((stat) => (
+                    <option value={stat}>
+                        {stat}
+                    </option>
+                    ))
+                )}
+                {tableName=="non_consumable" && (
+                  nonconsumableStatOptions.map((stat) => (
+                    <option value={stat}>
+                        {stat}
+                    </option>
+                    ))
+                )}
+                {tableName=="machine" && (
+                  machineStatOptions.map((stat) => (
+                    <option value={stat}>
+                        {stat}
+                    </option>
+                    ))
+                )}
+            </select>
+
+            {/* Submit button with disabled attribute based on conditions */}
+            <button onClick={handleButtonClick} disabled={isButtonDisabled}>
+              Submit
+            </button>
+
+            {isButtonDisabled || Object.keys(changeData).length === 0 ? (
+              <p></p>
+            ) : (
+              <div>
+                <h1>Scatter Plot</h1>
+                <ScatterPlot data={changeData} />
+              </div>
+            )}
+
+          </div>
+  
+        </div> 
       )}
     </div>
   );

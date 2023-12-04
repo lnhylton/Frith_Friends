@@ -5,6 +5,7 @@ import ast
 import password_backend
 from datetime import datetime
 
+
 BACKEND_PORT = 5001
 
 app = Flask(__name__)
@@ -194,6 +195,62 @@ def get_table_attributes():
         columns = [desc[0] for desc in cursor.description]
 
         return jsonify({"status": "success", "data": column_names})
+    
+    except Exception as e:
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)})
+    
+@app.route('/get_items', methods=['GET'])
+def get_items():
+    table_name = request.args.get('table_name')
+    if table_name is None:
+        return jsonify({"status": "error", "message": "Table name is required."})
+    try:
+        conn = mysql.connector.connect(**config)
+        cursor = conn.cursor()
+        # Use a parameterized query to retrieve data from the specified table
+        cursor.execute(f'SELECT name FROM {table_name}')
+        items = cursor.fetchall()
+
+        item_names = [item[0] for item in items]
+        print(item_names)
+
+        conn.close() 
+        # Convert the retrieved row to a dictionary for JSON response
+        return jsonify({"status": "success", "data": item_names})
+    
+    except Exception as e:
+        conn.close()
+        return jsonify({"status": "error", "message": str(e)})
+    
+@app.route('/get_changes', methods=['GET'])
+def get_changes():
+    table_name = request.args.get('table_name')
+    item_name = request.args.get('item_name')
+    query = request.args.get('query')
+    if table_name is None or item_name is None or query is None:
+        return jsonify({"status": "error", "message": "Table name and item name is required."})
+    try:
+        table_name += "_changes"
+        conn = mysql.connector.connect(**config)
+        cursor = conn.cursor()
+        # Use a parameterized query to retrieve data from the specified table
+        print(f"SELECT {query}, change_timestamp FROM {table_name} WHERE name='{item_name}'")
+        cursor.execute(f"SELECT {query}, change_timestamp FROM {table_name} WHERE name='{item_name}'")
+        items = cursor.fetchall()
+
+        item_names = [item[0] for item in items]
+        print(item_names)
+        timestamps = [item[1].strftime('%Y-%m-%d %H:%M:%S') for item in items]
+        #timestamps = [item[1] for item in items]
+
+        data = [{'x': timestamp, 'y': item} for item, timestamp in zip(item_names, timestamps)]
+
+        print(data)
+
+        conn.close() 
+        # Convert the retrieved row to a dictionary for JSON response
+        return jsonify({"status": "success", "data": data})
     
     except Exception as e:
         conn.close()
