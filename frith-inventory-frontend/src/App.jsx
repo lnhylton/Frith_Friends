@@ -86,11 +86,13 @@ function App() {
 
   const handleBackToMainContent = () => {
     setWaitLogin(false);
+    getLoggedInUsers();
   };
 
   const handleLogin = () => {
     setWaitLogin(true);
     setLoggedIn(true);
+    getLoggedInUsers();
   };
 
   const handleLogout = () => {
@@ -100,15 +102,15 @@ function App() {
         "Content-type": "application/json; charset=UTF-8"
       }
     })
-    .then((response) => response.json())
-    .then((data) => {
-      setLoggedIn(false)
-      console.log(data)
-      getLoggedInUsers()
-    })
-    .catch((e) => {
-      console.log("failed")
-    });
+      .then((response) => response.json())
+      .then((data) => {
+        setLoggedIn(false)
+        console.log(data)
+        getLoggedInUsers()
+      })
+      .catch((e) => {
+        console.log("failed")
+      });
   };
 
   const getLoggedInUsers = () => {
@@ -213,7 +215,7 @@ function App() {
   /* -------------------------------------------------------------------------- */
 
   const handleExitUpdate = () => {
-    setItemToEdit({id: 0, disp: false})
+    setItemToEdit({ id: 0, disp: false })
   }
 
   const handleRetrieveUpdateData = () => {
@@ -322,14 +324,14 @@ function App() {
           <NavLink style={({ isActive }) => ({
             color: isActive ? '#fff' : '',
             background: isActive ? '#888' : '',
-            pointerEvents: validateUser(loggedInUsers[0])>0 ? '' : 'none'
+            pointerEvents: validateUser(loggedInUsers[0]) > 0 ? '' : 'none'
           })} to="/ula">
             ULA
           </NavLink>
           <NavLink style={({ isActive }) => ({
             color: isActive ? '#fff' : '',
             background: isActive ? '#888' : '',
-            pointerEvents: validateUser(loggedInUsers[0])>1 ? '' : 'none'
+            pointerEvents: validateUser(loggedInUsers[0]) > 1 ? '' : 'none'
           })} to="/admin">
             Admin
           </NavLink>
@@ -338,13 +340,14 @@ function App() {
               Login
             </button>
             :
-            <button className="login-button" onClick={handleLogout}>
+            <NavLink className="login-button" to="/" onClick={handleLogout}>
               Logout
-            </button>}
+            </NavLink>
+            }
 
-            <button className="login-button" onClick={handleCreateUser}>
-              Create User
-            </button>
+          <button className="login-button" onClick={handleCreateUser}>
+            Create User
+          </button>
         </ul>
       </nav>
 
@@ -364,7 +367,7 @@ function App() {
             <option value="non_consumable">non_consumable</option>
             <option value="machine">machine</option>
           </select>
-              
+
           {/* ---------------------------- navigation ----------------------------- */}
 
           <div className="guest">
@@ -509,14 +512,14 @@ function App() {
 }
 
 const validateUser = (user) => {
-  try{
+  try {
     const type = user.UserType
     if (type == "ULA")
       return 1
     if (type == "admin")
       return 2
   }
-  catch{
+  catch {
   }
   return 0
 }
