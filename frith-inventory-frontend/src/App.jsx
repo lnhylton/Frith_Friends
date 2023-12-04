@@ -368,14 +368,14 @@ function App() {
           <NavLink style={({ isActive }) => ({
             color: isActive ? '#fff' : '',
             background: isActive ? '#888' : '',
-            pointerEvents: validateUser(loggedInUsers[0]) > 0 ? '' : 'none'
+            pointerEvents: validateUser(loggedInUsers) > 0 ? '' : 'none'
           })} to="/ula">
             ULA
           </NavLink>
           <NavLink style={({ isActive }) => ({
             color: isActive ? '#fff' : '',
             background: isActive ? '#888' : '',
-            pointerEvents: validateUser(loggedInUsers[0]) > 1 ? '' : 'none'
+            pointerEvents: validateUser(loggedInUsers) > 1 ? '' : 'none'
           })} to="/admin">
             Admin
           </NavLink>
@@ -401,12 +401,12 @@ function App() {
       <div className="main">
         <div className="leftbar">
           <button style={{
-            visibility: validateUser(loggedInUsers[0]) > 1 ? '' : 'hidden'
+            visibility: validateUser(loggedInUsers) > 1 ? '' : 'hidden'
           }} className="admin-button" onClick={handleDelete}>
             Delete
           </button>
           <button style={{
-            visibility: validateUser(loggedInUsers[0]) > 1 ? '' : 'hidden'
+            visibility: validateUser(loggedInUsers) > 1 ? '' : 'hidden'
           }} className="admin-button" onClick={handleAdd}>
             Add
           </button>
@@ -539,9 +539,9 @@ function App() {
   );
 }
 
-const validateUser = (user) => {
+const validateUser = (users) => {
   try {
-    const type = user.UserType
+    const type = user[0].UserType
     if (type == "ULA")
       return 1
     if (type == "admin")
