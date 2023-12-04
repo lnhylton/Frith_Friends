@@ -7,6 +7,7 @@ import './App.css';
 import LoginForm from './login.jsx'; // Assuming the login file is in the same directory
 import FrithLogo from './components/frith_logo.jsx'
 import CreateUserForm from './components/create_user.jsx';
+import DeleteUserForm from './components/delete_user.jsx';
 import DeleteForm from './components/delete.jsx';
 import AddForm from './components/add.jsx';
 
@@ -30,6 +31,8 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false); // Login state
   const [loggedInUsers, setLoggedInUsers] = useState({});
   const [createUserAppear, setCreateUserAppear] = useState(false);
+  const [deleteUserAppear, setDeleteUserAppear] = useState(false);
+
 
   const [itemToEdit, setItemToEdit] = useState({ id: 0, disp: false });
 
@@ -216,6 +219,14 @@ function App() {
     setCreateUserAppear(false);
   }
 
+  const handleDeleteUser = () => {
+    setDeleteUserAppear(true);
+  };
+
+  const handleBackDeleteUser = () => {
+    setDeleteUserAppear(false);
+  }
+
   /* -------------------------------------------------------------------------- */
   /*                                 Data List                                  */
   /* -------------------------------------------------------------------------- */
@@ -361,6 +372,15 @@ function App() {
           <></>
       }
 
+      {
+          deleteUserAppear ?
+          <div className="popup">
+            <DeleteUserForm onBack={handleBackDeleteUser} />
+          </div>
+          :
+          <></>
+      }
+
       <nav className="navbar">
         <ul>
           <NavLink style={({ isActive }) => ({
@@ -395,6 +415,10 @@ function App() {
 
           <button className="login-button" onClick={handleCreateUser}>
             Create User
+          </button>
+
+          <button className="login-button" onClick={handleDeleteUser}>
+            Delete User
           </button>
 
             <button className="login-button" onClick={handleDelete}>
