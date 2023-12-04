@@ -12,7 +12,7 @@ CORS(app)
 
 config = {
     'host': 'localhost',
-    'user': 'Admin',
+    'user': 'admin',
     'password': 'frith',
     'database': 'frith_friends'
 }
@@ -240,7 +240,7 @@ def login():
 
 @app.route('/logout', methods=["POST"])
 def logout():
-    data = get_logged_in_users()
+    data = get_logged_in_users().json['data'][0]
 
     conn = mysql.connector.connect(**config)
     cursor = conn.cursor()
@@ -356,11 +356,16 @@ def get_logged_in_users():
     cursor = conn.cursor()
     
     try:
+        data = []
         # Use a parameterized query to retrieve data from the specified table and row
-        cursor.execute(f'SELECT Username FROM user_authentication WHERE UserIsLoggedIn = 1;')
+        cursor.execute(f'SELECT Username, UserType FROM user_authentication WHERE UserIsLoggedIn = 1;')
         users = cursor.fetchall()
+        column_names = [desc[0] for desc in cursor.description]
+
+        # Convert rows to a list of dictionaries
+        data += [dict(zip(column_names, user)) for user in users]
         conn.close()
-        return jsonify({"status": "success", "data": users})
+        return jsonify({"status": "success", "data": data})
     except Exception as e:
         conn.close()
         return jsonify({"status": "error", "message": str(e)})
